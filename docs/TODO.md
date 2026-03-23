@@ -19,6 +19,7 @@ Nenhum item em progresso.
 
 - [x] Scaffold inicial gerado (2026-03-20T18:44:10Z)
 - [x] Atualizacao global das especificacoes da feature 002 concluida (2026-03-23)
+- [x] Commit inicial consolidando baseline documental da sessao (2026-03-23)
 
 ## 🔵 Pendente (Feature 002)
 
@@ -28,4 +29,4 @@ Nenhum item em progresso.
 
 ## 🔵 Pendente (Fechamento de Repositorio)
 
-- [ ] Criar commit inicial consolidando baseline documental da sessao
+- [x] Criar commit inicial consolidando baseline documental da sessao
