@@ -25,6 +25,7 @@ Invoke this agent when:
 - `/recover-context`
 - `/first-time-setup`
 - `/session-end` or `/end-session`
+- `atualizar repositorio` or `atualizar repositório`
 
 ## Core Responsibilities
 
@@ -243,6 +244,8 @@ Invoke this agent when:
 
 7. **Git Repository Update**
    - Stage all documentation updates: `git add docs/`
+    - Interpretation rule: if the user asks to `atualizar repositorio`
+       (or `atualizar repositório`), this MUST mean `commit + push`.
    - Create commit message file with detailed session summary:
      ```
      docs(sessão): encerramento YYYY-MM-DD
@@ -260,7 +263,7 @@ Invoke this agent when:
      ✅ Ready for next session
      ```
    - Commit using file: `git commit -F /tmp/commit-session-end-[date].txt`
-   - Optionally push if requested: `git push`
+    - Push after commit: `git push`
 
 8. **Session Closure Report**
    - Display summary:
