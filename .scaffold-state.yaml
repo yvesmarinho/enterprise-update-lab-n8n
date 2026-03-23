@@ -1,0 +1,15 @@
+scaffold_version: 1.0.0
+created_at: '2026-03-20T18:44:10Z'
+updated_at: '2026-03-20T18:45:03Z'
+project:
+  name: enterprise-update-lab-n8n
+  title: Enterprise Update Lab N8N
+  description: Laboratório para atualização de versão do N8N para evitar transtornos
+    na produção
+  domain: infrastructure
+  language: python
+  github_repo: ''
+paths:
+  target_dir: /home/yves_marinho/Documentos/DevOps/Vya-Jobs
+  shared_dir: /home/yves_marinho/Documentos/DevOps/.copilot-shared
+profiles_applied: []

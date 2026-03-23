@@ -1,0 +1,241 @@
+prompt:
+  role: user
+  content:
+    description: "Projeto para atualizar o N8N da versão 2.6.4 até a última disponível, analisando o status para garantir compatibilidade e desempenho. A atualização deve ser feita versão a versão, sem salto entre versões intermediárias."
+    specification:
+      - project_name: "enterprise-update-lab-n8n"
+      - response: "Documentos e códigos Python e Ansible para automatizar a atualização do N8N, incluindo análise de compatibilidade e desempenho. O fluxo deve executar atualização sequencial versão a versão (2.6.4 -> ... -> latest)."
+      - docstyle: "Documentar o código, se possível, segundo padrão reStructuredText do Docstring, incluindo Doct test."
+      - workflow: "objetivo.yaml → Copilot → mcp-questions.yaml → MCP automático"
+      - rules:
+          - "Seguir o fluxo de trabalho do framework Speckit."
+          - "Criar fluxo de atualização de container do N8N evitando erros de compatibilidade e desempenho."
+          - "Atualizações do N8N devem ser executadas versão a versão, sem pular versões intermediárias."
+          - "A resolução da versão latest deve usar tags oficiais do n8n como fonte primária e release notes oficiais como fallback com justificativa."
+          - "Fluxo de trabalho deve ser guiado por prompts para GitHub Copilot"
+          - "Configuração MCP deve ser gerada automaticamente baseada nas especificações"
+          - "Sistema de versionamento e histórico deve rastrear todas as mudanças"
+          - "Ambiente de teste está publicado no servidor `wfdb01`, na pasta `/opt/docker_user/n8n`."
+          - "Atenção à configuração de conexão SSH SPA contidos em `.secrets/ssh.json`"
+    folder_structure:
+      - ".vscode - Configurações VS Code e MCP (geradas automaticamente)"
+      - ".github - Workflows de GitHub Actions para automação de CI/CD e AI agents"
+      - "src - Código-fonte do projeto (estrutura específica por tipo)"
+      - ".specify - Github Sepckit framework configuration e templates"
+      - "test - Testes automatizados (framework baseado na linguagem)"
+      - "docs - Documentação (gerada automaticamente)"
+      - "pattern_code - Templates e padrões de código reutilizáveis"
+      - "scripts - Scripts de automação inteligente"
+      - "objetivo.yaml - Especificação detalhada do projeto"
+      - "mcp-questions.yaml - Configuração gerada pelo Copilot"
+    expected_outcome:
+      - return_info: "Arquivos MD com a documentação de todas as ações e códigos Python e Ansible gerados para a atualização do N8N, seguindo o fluxo de trabalho especificado."
+      - workflow_result: "Fluxo de 4 etapas: constitution → plan → tasks → implement"
+      - ai_integration: "Prompts específicos de agents para GitHub Copilot guiarem toda a configuração"
+      - multi_technology: "Suporte automático para Python e Ansible."
+    profile:
+      - role: system_architect
+        skill_level: "expert"
+        description: "Arquiteto em soluções Docker com Linux Debian 12."
+        foco:
+          - "Estratégia de upgrade entre versões do n8n (2.6.4 -> latest) com execução versão a versão"
+          - "Compatibilidade entre imagem, volumes, banco e variáveis de ambiente"
+          - "Definição de gates técnicos para promoção entre ambientes"
+        responsabilidades:
+          - "Definir arquitetura de atualização com rollback seguro"
+          - "Aprovar sequência de execução por etapas do workflow Speckit"
+          - "Definir critérios de risco e janela de manutenção"
+        criterios_decisao:
+          - "Priorizar disponibilidade e integridade de dados"
+          - "Evitar mudanças não reversíveis sem backup validado"
+      - role: N8N_specialist
+        skill_level: "expert"
+        description: "Especialista em N8N e automação de workflows."
+        foco:
+          - "Quebras de compatibilidade entre versões do n8n"
+          - "Impacto em nodes, credenciais, executions e filas"
+          - "Validação funcional de workflows críticos"
+        responsabilidades:
+          - "Mapear riscos por versão e notas de release"
+          - "Definir checklist de validação pós-upgrade"
+          - "Validar comportamento de workflows em ambiente de teste"
+        criterios_decisao:
+          - "Zero perda de execuções e credenciais"
+          - "Sem regressão funcional nos fluxos críticos"
+      - role: devops_engineer
+        skill_level: "expert"
+        description: "Expert em Python, Ansible e SDD (Specification-Driven Development)."
+        foco:
+          - "Automação idempotente de atualização"
+          - "Padronização de scripts e playbooks"
+          - "Implementação orientada por especificação (SDD)"
+          - "Coleta de evidências técnicas e logs de execução"
+        responsabilidades:
+          - "Especificar automações de pré-check, upgrade e pós-check"
+          - "Padronizar variáveis de ambiente e parâmetros de execução"
+          - "Garantir rastreabilidade entre especificação e execução"
+          - "Garantir reprodutibilidade do processo em múltiplos ambientes"
+        criterios_decisao:
+          - "Execução não interativa e auditável"
+          - "Conformidade com requisitos definidos na especificação"
+          - "Falhas tratadas com retorno e ação de recuperação"
+      - role: devops_automation
+        skill_level: "advanced"
+        description: "Especialista em DevOps, automação de workflows de desenvolvimento e SDD."
+        foco:
+          - "Orquestração do fluxo objetivo.yaml -> mcp-questions.yaml -> MCP"
+          - "Governança de documentação e versionamento"
+          - "Adoção de SDD para padronizar decisões técnicas"
+          - "Padronização dos prompts e artefatos de sessão"
+        responsabilidades:
+          - "Garantir consistência entre especificação, plano e tarefas"
+          - "Rastrear mudanças e dependências entre artefatos"
+          - "Assegurar que execução siga os critérios definidos em spec"
+          - "Definir critérios de completude de cada etapa"
+        criterios_decisao:
+          - "Rastreabilidade ponta a ponta das decisões"
+          - "Priorizar entregas aderentes ao ciclo SDD"
+          - "Documentação incremental e verificável"
+      - role: project_manager
+        skill_level: "advanced"
+        description: "Gestor de projetos com foco em governança, planejamento e entrega incremental."
+        foco:
+          - "Planejamento de marcos e cronograma do upgrade"
+          - "Sequenciamento e controle de versões intermediárias em cada etapa"
+          - "Gestão de riscos, comunicação e alinhamento entre perfis"
+          - "Acompanhamento de progresso por critérios de aceite"
+        responsabilidades:
+          - "Definir plano de execução e priorização por impacto"
+          - "Gerenciar dependências, impedimentos e decisões"
+          - "Garantir visibilidade de status para stakeholders"
+        criterios_decisao:
+          - "Maximizar previsibilidade de entrega"
+          - "Reduzir risco operacional durante a janela de mudança"
+      - role: test_engineer
+        skill_level: "expert"
+        description: "Engenheiro de testes para validação funcional, regressão e desempenho da atualização."
+        foco:
+          - "Estratégia de testes pré e pós-upgrade"
+          - "Validação de compatibilidade e regressão a cada versão intermediária"
+          - "Cobertura de cenários críticos e regressão"
+          - "Métricas de desempenho e estabilidade"
+        responsabilidades:
+          - "Definir matriz de testes por risco e criticidade"
+          - "Executar validações funcionais e de compatibilidade"
+          - "Consolidar evidências de teste para aprovação de release"
+        criterios_decisao:
+          - "Sem regressões críticas em workflows prioritários"
+          - "Desempenho e estabilidade dentro de limites aceitáveis"
+    features_implemented:
+      - id: F01
+        nome: "Fluxo de trabalho inteligente com 5 etapas automatizadas"
+        status: "implemented"
+        escopo:
+          - "Conduz o projeto por etapas de descoberta, planejamento e execução"
+          - "Reduz saltos de contexto e decisões ad-hoc"
+        criterio_aceite:
+          - "Cada etapa produz artefato explícito e rastreável"
+      - id: F02
+        nome: "Sistema de prompts específicos para GitHub Copilot"
+        status: "implemented"
+        escopo:
+          - "Padroniza interação dos agentes por objetivo"
+          - "Aumenta consistência de saída entre sessões"
+        criterio_aceite:
+          - "Prompts orientam entradas, saídas e validações esperadas"
+      - id: F03
+        nome: "Template agnóstico a tecnologia com adaptação automática"
+        status: "implemented"
+        escopo:
+          - "Permite uso do framework com stack heterogênea"
+          - "Mantém núcleo de processo sem acoplamento rígido"
+        criterio_aceite:
+          - "Estrutura-base permanece válida para Python e Ansible"
+      - id: F04
+        nome: "Makefile com 15+ targets seguindo novo fluxo de trabalho"
+        status: "implemented"
+        escopo:
+          - "Organiza execução operacional por comandos previsíveis"
+          - "Centraliza tarefas de rotina e validação"
+        criterio_aceite:
+          - "Targets cobrem ciclo de desenvolvimento e QA"
+      - id: F05
+        nome: "Scripts Python inteligentes para geração de configurações"
+        status: "implemented"
+        escopo:
+          - "Automatiza geração de artefatos de configuração"
+          - "Reduz erro humano de edição manual"
+        criterio_aceite:
+          - "Geração determinística para mesma entrada"
+      - id: F06
+        nome: "Suporte nativo a múltiplas linguagens e frameworks"
+        status: "implemented"
+        escopo:
+          - "Expande aplicabilidade do template"
+          - "Facilita adoção em cenários híbridos"
+        criterio_aceite:
+          - "Regras e estruturas não bloqueiam adoção multi-stack"
+      - id: F07
+        nome: "Templates de código com padrões reStructuredText"
+        status: "implemented"
+        escopo:
+          - "Uniformiza docstrings e documentação técnica"
+          - "Favorece legibilidade e manutenção"
+        criterio_aceite:
+          - "Templates contemplam padrão reStructuredText e Doctest"
+      - id: F08
+        nome: "Documentação automática baseada na configuração"
+        status: "implemented"
+        escopo:
+          - "Gera documentação coerente com estado do projeto"
+          - "Reduz divergência entre prática e registro"
+        criterio_aceite:
+          - "Artefatos de docs refletem inputs de configuração"
+      - id: F09
+        nome: "Configuração VS Code dinâmica e específica por projeto"
+        status: "implemented"
+        escopo:
+          - "Ajusta ambiente de desenvolvimento ao domínio"
+          - "Melhora produtividade e conformidade"
+        criterio_aceite:
+          - "Configuração atende padrões definidos por perfil/projeto"
+      - id: F10
+        nome: "Estrutura de pastas extensível e padronizada"
+        status: "implemented"
+        escopo:
+          - "Favorece escalabilidade organizacional"
+          - "Facilita navegação e manutenção"
+        criterio_aceite:
+          - "Estrutura suporta crescimento sem refatoração estrutural"
+      - id: F11
+        nome: "Sistema de geração de HISTORICO.md cronológico para callback de sessões"
+        status: "implemented"
+        escopo:
+          - "Registra evolução de decisões e ações"
+          - "Permite retomada de contexto com baixa fricção"
+        criterio_aceite:
+          - "Entradas cronológicas mantêm rastreabilidade temporal"
+      - id: F12
+        nome: "Versionamento automático de arquivos editados (filename-vnnn.* pattern)"
+        status: "implemented"
+        escopo:
+          - "Mantém trilha de versões em alterações relevantes"
+          - "Facilita comparação e rollback pontual"
+        criterio_aceite:
+          - "Padrão de nomenclatura de versão é consistente"
+      - id: F13
+        nome: "Backup e recuperação de códigos com falha na execução"
+        status: "implemented"
+        escopo:
+          - "Reduz risco operacional em mudanças"
+          - "Apoia recuperação rápida após erro"
+        criterio_aceite:
+          - "Processo de restore definido e testável"
+      - id: F14
+        nome: "Rastreamento completo de mudanças e rollback automático"
+        status: "implemented"
+        escopo:
+          - "Garante auditabilidade fim a fim"
+          - "Suporta reversão com baixa indisponibilidade"
+        criterio_aceite:
+          - "Eventos críticos possuem trilha e estratégia de reversão"

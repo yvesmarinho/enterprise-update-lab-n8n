@@ -1,0 +1,379 @@
+# Configuracao MCP para projeto de update do n8n
+# Gerado a partir de docs/objetivo.yaml e do modelo de mcp-questions
+
+metadata:
+  project_name: "enterprise-update-lab-n8n"
+  project_type: "infrastructure"
+  domain: "devops"
+  primary_language: "python"
+  automation_languages:
+    - "python"
+    - "ansible"
+  template_type: "enterprise"
+  generated_from:
+    - "docs/objetivo.yaml"
+    - "docs/mcp-questions.yaml (estrutura-modelo anterior)"
+  generated_on: "2026-03-23"
+
+project_context:
+  description: "Projeto para atualizar o n8n da versao 2.6.4 ate a ultima disponivel, analisando compatibilidade e desempenho. A execucao deve ocorrer versao a versao, sem salto."
+  source_version: "2.6.4"
+  target_version: "latest"
+  latest_resolution:
+    source_precedence:
+      - "official_n8n_release_tags"
+      - "official_n8n_release_notes_fallback"
+    resolved_target_frozen_per_round: true
+    required_evidence:
+      - "source_url"
+      - "resolved_timestamp"
+      - "resolved_version"
+  upgrade_policy: "sequential_version_by_version"
+  skip_versions_allowed: false
+  response_expected: "Documentos e codigos Python e Ansible para automatizar o update do n8n com analise de compatibilidade e desempenho."
+  workflow_reference: "objetivo.yaml -> Copilot -> mcp-questions.yaml -> MCP automatico"
+  test_environment:
+    host: "wfdb01"
+    path: "/opt/docker_user/n8n"
+    ssh_config_reference: ".secrets/ssh.json"
+
+workflow:
+  framework: "Speckit"
+  execution_flow:
+    - "constitution"
+    - "plan"
+    - "tasks"
+    - "implement"
+  stage_gates:
+    - stage: "constitution"
+      acceptance: "Principios, regras e limites de seguranca definidos"
+    - stage: "plan"
+      acceptance: "Plano de upgrade com trilha versao a versao, riscos, rollback e metricas"
+    - stage: "tasks"
+      acceptance: "Tarefas ordenadas por dependencia e criticidade"
+    - stage: "implement"
+      acceptance: "Execucao com evidencias, validacao e rastreabilidade"
+
+folder_structure:
+  - ".vscode - Configuracoes VS Code e MCP (geradas automaticamente)"
+  - ".github - Workflows de GitHub Actions para automacao de CI/CD e AI agents"
+  - "src - Codigo-fonte do projeto (estrutura especifica por tipo)"
+  - ".specify - Speckit framework configuration e templates"
+  - "test - Testes automatizados (framework baseado na linguagem)"
+  - "docs - Documentacao (gerada automaticamente)"
+  - "pattern_code - Templates e padroes de codigo reutilizaveis"
+  - "scripts - Scripts de automacao inteligente"
+  - "objetivo.yaml - Especificacao detalhada do projeto"
+  - "mcp-questions.yaml - Configuracao gerada pelo Copilot"
+
+profiles:
+  - role: "system_architect"
+    skill_level: "expert"
+    description: "Arquiteto em solucoes Docker com Linux Debian 12."
+    focus:
+      - "Estrategia de upgrade entre versoes do n8n (2.6.4 -> latest) com execucao versao a versao"
+      - "Compatibilidade entre imagem, volumes, banco e variaveis de ambiente"
+      - "Definicao de gates tecnicos para promocao entre ambientes"
+    responsibilities:
+      - "Definir arquitetura de atualizacao com rollback seguro"
+      - "Aprovar sequencia de execucao por etapas do workflow Speckit"
+      - "Definir criterios de risco e janela de manutencao"
+    decision_criteria:
+      - "Priorizar disponibilidade e integridade de dados"
+      - "Evitar mudancas nao reversiveis sem backup validado"
+
+  - role: "n8n_specialist"
+    skill_level: "expert"
+    description: "Especialista em n8n e automacao de workflows."
+    focus:
+      - "Quebras de compatibilidade entre versoes do n8n"
+      - "Impacto em nodes, credenciais, executions e filas"
+      - "Validacao funcional de workflows criticos"
+    responsibilities:
+      - "Mapear riscos por versao e notas de release"
+      - "Definir checklist de validacao pos-upgrade"
+      - "Validar comportamento de workflows em ambiente de teste"
+    decision_criteria:
+      - "Zero perda de execucoes e credenciais"
+      - "Sem regressao funcional nos fluxos criticos"
+
+  - role: "devops_engineer"
+    skill_level: "expert"
+    description: "Expert em Python, Ansible e SDD (Specification-Driven Development)."
+    focus:
+      - "Automacao idempotente de atualizacao"
+      - "Padronizacao de scripts e playbooks"
+      - "Implementacao orientada por especificacao (SDD)"
+      - "Coleta de evidencias tecnicas e logs de execucao"
+    responsibilities:
+      - "Especificar automacoes de pre-check, upgrade e pos-check"
+      - "Padronizar variaveis de ambiente e parametros de execucao"
+      - "Garantir rastreabilidade entre especificacao e execucao"
+      - "Garantir reprodutibilidade do processo em multiplos ambientes"
+    decision_criteria:
+      - "Execucao nao interativa e auditavel"
+      - "Conformidade com requisitos definidos na especificacao"
+      - "Falhas tratadas com retorno e acao de recuperacao"
+
+  - role: "devops_automation"
+    skill_level: "advanced"
+    description: "Especialista em DevOps, automacao de workflows de desenvolvimento e SDD."
+    focus:
+      - "Orquestracao do fluxo objetivo.yaml -> mcp-questions.yaml -> MCP"
+      - "Governanca de documentacao e versionamento"
+      - "Adocao de SDD para padronizar decisoes tecnicas"
+      - "Padronizacao dos prompts e artefatos de sessao"
+    responsibilities:
+      - "Garantir consistencia entre especificacao, plano e tarefas"
+      - "Rastrear mudancas e dependencias entre artefatos"
+      - "Assegurar que execucao siga os criterios definidos em spec"
+      - "Definir criterios de completude de cada etapa"
+    decision_criteria:
+      - "Rastreabilidade ponta a ponta das decisoes"
+      - "Priorizar entregas aderentes ao ciclo SDD"
+      - "Documentacao incremental e verificavel"
+
+  - role: "project_manager"
+    skill_level: "advanced"
+    description: "Gestor de projetos com foco em governanca, planejamento e entrega incremental."
+    focus:
+      - "Planejamento de marcos e cronograma do upgrade"
+      - "Gestao de riscos, comunicacao e alinhamento entre perfis"
+      - "Acompanhamento de progresso por criterios de aceite"
+    responsibilities:
+      - "Definir plano de execucao e priorizacao por impacto"
+      - "Gerenciar dependencias, impedimentos e decisoes"
+      - "Garantir visibilidade de status para stakeholders"
+    decision_criteria:
+      - "Maximizar previsibilidade de entrega"
+      - "Reduzir risco operacional durante a janela de mudanca"
+
+  - role: "test_engineer"
+    skill_level: "expert"
+    description: "Engenheiro de testes para validacao funcional, regressao e desempenho da atualizacao."
+    focus:
+      - "Estrategia de testes pre e pos-upgrade"
+      - "Cobertura de cenarios criticos e regressao"
+      - "Metricas de desempenho e estabilidade"
+    responsibilities:
+      - "Definir matriz de testes por risco e criticidade"
+      - "Executar validacoes funcionais e de compatibilidade"
+      - "Consolidar evidencias de teste para aprovacao de release"
+    decision_criteria:
+      - "Sem regressos criticos em workflows prioritarios"
+      - "Desempenho e estabilidade dentro de limites aceitaveis"
+
+features_implemented:
+  - id: "F01"
+    name: "Fluxo de trabalho inteligente com 5 etapas automatizadas"
+    status: "implemented"
+    scope:
+      - "Conduz o projeto por etapas de descoberta, planejamento e execucao"
+      - "Reduz saltos de contexto e decisoes ad-hoc"
+    acceptance_criteria:
+      - "Cada etapa produz artefato explicito e rastreavel"
+
+  - id: "F02"
+    name: "Sistema de prompts especificos para GitHub Copilot"
+    status: "implemented"
+    scope:
+      - "Padroniza interacao dos agentes por objetivo"
+      - "Aumenta consistencia de saida entre sessoes"
+    acceptance_criteria:
+      - "Prompts orientam entradas, saidas e validacoes esperadas"
+
+  - id: "F03"
+    name: "Template agnostico a tecnologia com adaptacao automatica"
+    status: "implemented"
+    scope:
+      - "Permite uso do framework com stack heterogenea"
+      - "Mantem nucleo de processo sem acoplamento rigido"
+    acceptance_criteria:
+      - "Estrutura-base permanece valida para Python e Ansible"
+
+  - id: "F04"
+    name: "Makefile com 15+ targets seguindo novo fluxo de trabalho"
+    status: "implemented"
+    scope:
+      - "Organiza execucao operacional por comandos previsiveis"
+      - "Centraliza tarefas de rotina e validacao"
+    acceptance_criteria:
+      - "Targets cobrem ciclo de desenvolvimento e QA"
+
+  - id: "F05"
+    name: "Scripts Python inteligentes para geracao de configuracoes"
+    status: "implemented"
+    scope:
+      - "Automatiza geracao de artefatos de configuracao"
+      - "Reduz erro humano de edicao manual"
+    acceptance_criteria:
+      - "Geracao deterministica para mesma entrada"
+
+  - id: "F06"
+    name: "Suporte nativo a multiplas linguagens e frameworks"
+    status: "implemented"
+    scope:
+      - "Expande aplicabilidade do template"
+      - "Facilita adocao em cenarios hibridos"
+    acceptance_criteria:
+      - "Regras e estruturas nao bloqueiam adocao multi-stack"
+
+  - id: "F07"
+    name: "Templates de codigo com padroes reStructuredText"
+    status: "implemented"
+    scope:
+      - "Uniformiza docstrings e documentacao tecnica"
+      - "Favorece legibilidade e manutencao"
+    acceptance_criteria:
+      - "Templates contemplam padrao reStructuredText e Doctest"
+
+  - id: "F08"
+    name: "Documentacao automatica baseada na configuracao"
+    status: "implemented"
+    scope:
+      - "Gera documentacao coerente com estado do projeto"
+      - "Reduz divergencia entre pratica e registro"
+    acceptance_criteria:
+      - "Artefatos de docs refletem inputs de configuracao"
+
+  - id: "F09"
+    name: "Configuracao VS Code dinamica e especifica por projeto"
+    status: "implemented"
+    scope:
+      - "Ajusta ambiente de desenvolvimento ao dominio"
+      - "Melhora produtividade e conformidade"
+    acceptance_criteria:
+      - "Configuracao atende padroes definidos por perfil/projeto"
+
+  - id: "F10"
+    name: "Estrutura de pastas extensivel e padronizada"
+    status: "implemented"
+    scope:
+      - "Favorece escalabilidade organizacional"
+      - "Facilita navegacao e manutencao"
+    acceptance_criteria:
+      - "Estrutura suporta crescimento sem refatoracao estrutural"
+
+  - id: "F11"
+    name: "Sistema de geracao de HISTORICO.md cronologico para callback de sessoes"
+    status: "implemented"
+    scope:
+      - "Registra evolucao de decisoes e acoes"
+      - "Permite retomada de contexto com baixa friccao"
+    acceptance_criteria:
+      - "Entradas cronologicas mantem rastreabilidade temporal"
+
+  - id: "F12"
+    name: "Versionamento automatico de arquivos editados (filename-vnnn.* pattern)"
+    status: "implemented"
+    scope:
+      - "Mantem trilha de versoes em alteracoes relevantes"
+      - "Facilita comparacao e rollback pontual"
+    acceptance_criteria:
+      - "Padrao de nomenclatura de versao e consistente"
+
+  - id: "F13"
+    name: "Backup e recuperacao de codigos com falha na execucao"
+    status: "implemented"
+    scope:
+      - "Reduz risco operacional em mudancas"
+      - "Apoia recuperacao rapida apos erro"
+    acceptance_criteria:
+      - "Processo de restore definido e testavel"
+
+  - id: "F14"
+    name: "Rastreamento completo de mudancas e rollback automatico"
+    status: "implemented"
+    scope:
+      - "Garante auditabilidade fim a fim"
+      - "Suporta reversao com baixa indisponibilidade"
+    acceptance_criteria:
+      - "Eventos criticos possuem trilha e estrategia de reversao"
+
+mcp_questions:
+  discovery:
+    - id: "Q01"
+      question: "Qual versao exata do n8n esta em execucao no ambiente wfdb01?"
+      rationale: "Confirmar baseline antes do upgrade"
+      expected_answer_type: "string"
+      default: "2.6.4"
+
+    - id: "Q02"
+      question: "Qual estrategia de update de container sera adotada (in-place, blue-green, canary) mantendo upgrade versao a versao?"
+      rationale: "Definir risco, plano de rollback e trilha de versoes intermediarias"
+      expected_answer_type: "enum"
+      options: ["in-place", "blue-green", "canary"]
+
+    - id: "Q03"
+      question: "Quais workflows sao criticos para validacao obrigatoria pos-upgrade?"
+      rationale: "Definir cobertura minima de testes"
+      expected_answer_type: "list"
+
+  compatibility:
+    - id: "Q04"
+      question: "Quais dependencias externas devem ser validadas (DB, filas, webhooks, credenciais)?"
+      rationale: "Evitar regressao de integracao"
+      expected_answer_type: "list"
+
+    - id: "Q05"
+      question: "Existe mudanca de variaveis de ambiente entre a versao atual e a alvo?"
+      rationale: "Prevenir falha de startup"
+      expected_answer_type: "boolean"
+
+    - id: "Q06"
+      question: "Quais limites de desempenho sao aceitaveis apos o upgrade?"
+      rationale: "Estabelecer criterio objetivo de aceite"
+      expected_answer_type: "map"
+
+  operations:
+    - id: "Q07"
+      question: "Qual janela de manutencao aprovada para execucao do upgrade?"
+      rationale: "Alinhar operacao com disponibilidade do servico"
+      expected_answer_type: "string"
+
+    - id: "Q08"
+      question: "Qual procedimento de backup e restore sera usado antes da mudanca?"
+      rationale: "Garantir recuperacao em caso de falha"
+      expected_answer_type: "text"
+
+    - id: "Q09"
+      question: "Quais evidencias devem ser anexadas para aprovar a release?"
+      rationale: "Padronizar auditoria e compliance"
+      expected_answer_type: "list"
+
+  governance:
+    - id: "Q10"
+      question: "Qual responsavel aprova cada gate (constitution, plan, tasks, implement)?"
+      rationale: "Definir accountability por etapa"
+      expected_answer_type: "map"
+
+    - id: "Q11"
+      question: "Qual estrategia de rastreabilidade sera usada entre spec, tarefas e execucao?"
+      rationale: "Suportar SDD e auditoria"
+      expected_answer_type: "text"
+
+    - id: "Q12"
+      question: "Quais riscos bloqueadores impedem promover para producao?"
+      rationale: "Definir criterios de no-go"
+      expected_answer_type: "list"
+
+rules:
+  - "Seguir o fluxo de trabalho do framework Speckit"
+  - "Criar fluxo de atualizacao de container do n8n evitando erros de compatibilidade e desempenho"
+  - "Atualizacao do n8n deve ocorrer versao a versao desde 2.6.4 ate latest, sem pular versoes"
+  - "Fluxo de trabalho deve ser guiado por prompts para GitHub Copilot"
+  - "Configuracao MCP deve ser gerada automaticamente baseada nas especificacoes"
+  - "Sistema de versionamento e historico deve rastrear todas as mudancas"
+  - "Ambiente de teste esta publicado no servidor wfdb01 na pasta /opt/docker_user/n8n"
+  - "Atencao a configuracao de conexao SSH SPA contidos em .secrets/ssh.json"
+
+output_contract:
+  expected_outputs:
+    - "Documentacao em Markdown com historico de acoes"
+    - "Artefatos para automacao em Python e Ansible"
+    - "Roteiro de compatibilidade e desempenho para update do n8n"
+  quality_requirements:
+    - "Documentacao incremental"
+    - "Rastreabilidade ponta a ponta"
+    - "Rollback testavel"
+    - "Validacao funcional e nao funcional"
