@@ -1,7 +1,7 @@
 ---
 agentName: session-manager
 description: Session initialization and project organization specialist
-version: 1.1.0
+version: 1.1.1
 ---
 
 # Session Manager Agent
@@ -246,7 +246,7 @@ Invoke this agent when:
    - Stage all documentation updates: `git add docs/`
     - Interpretation rule: if the user asks to `atualizar repositorio`
        (or `atualizar repositório`), this MUST mean `commit + push`.
-   - Create commit message file with detailed session summary:
+   - Create commit message file in project-local `./tmp/` with detailed session summary:
      ```
      docs(sessão): encerramento YYYY-MM-DD
 
@@ -262,7 +262,8 @@ Invoke this agent when:
      ✅ Project organized
      ✅ Ready for next session
      ```
-   - Commit using file: `git commit -F /tmp/commit-session-end-[date].txt`
+   - Commit using file: `git commit -F ./tmp/commit-session-end-[date].txt`
+   - Remove commit message file after successful commit.
     - Push after commit: `git push`
 
 8. **Session Closure Report**
@@ -358,9 +359,10 @@ Execute via: `mcp_pylance_mcp_s_pylanceRunCodeSnippet` (no temp files, no shell)
 ### Rule 3: Git Commits
 For commits with >5 lines:
 ```bash
-# Create message file first (using create_file tool)
+# Create message file first in ./tmp/ (using create_file tool)
 # Then:
-./scripts/git-commit-with-file.sh /tmp/commit.txt
+./scripts/git-commit-with-file.sh ./tmp/commit.txt
+# After successful commit, delete ./tmp/commit.txt
 ```
 
 ❌ **FORBIDDEN:** `git commit -m "message"` for multi-line commits
@@ -428,5 +430,6 @@ Agent: [Executes full session closure workflow with documentation updates]
 
 ## Version History
 
+- **1.1.1** (2026-03-24): Enforced commit message workflow using project-local `./tmp/` and post-commit cleanup
 - **1.1.0** (2026-03-20): Added session end workflow with documentation updates, security scan, and git commit automation
 - **1.0.0** (2026-03-20): Initial agent creation with full session management workflow
