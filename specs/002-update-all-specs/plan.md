@@ -118,3 +118,16 @@ Post-Design Gate Status:
 - Compatibility Coverage: PASS
 - Validation Evidence: PASS
 - Incremental Documentation: PASS
+
+## Remediation Exit Gate (2026-03-24)
+
+- CT-002/CT-003/CT-005/CT-006 operacionalizados em protocolo explicito de metricas por checkpoint.
+- FR-010 operacionalizado por protocolo formal de excecao de salto de versao.
+- TM-003 operacionalizado por matriz explicita de aceite -> validacao -> evidencia.
+- Status formal da spec alinhado para handoff controlado.
+
+Remediation Gate Status:
+
+- Coverage Gaps (G1/G2/G3): PASS
+- Spec Status Consistency (I1): PASS
+- Readiness for Controlled Handoff: PASS (documental)

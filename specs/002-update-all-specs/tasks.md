@@ -98,6 +98,20 @@
 
 ---
 
+## Phase 7: Remediation Gate (2026-03-24)
+
+**Purpose**: Remediar gaps criticos/high da analise cruzada final e liberar prontidao para handoff operacional controlado.
+
+- [x] T036 [US2] Definir protocolo operacional de metricas de checkpoint (baseline, p95, throughput 15 minutos) em specs/002-update-all-specs/checkpoint-metrics-protocol.md
+- [x] T037 [US2] Definir regra objetiva de gate para CT-002 e CT-003 com criterio GO/NO-GO em specs/002-update-all-specs/checkpoint-metrics-protocol.md
+- [x] T038 [US2] Formalizar protocolo de excecao de salto de versao para FR-010 em specs/002-update-all-specs/version-skip-exception-protocol.md
+- [x] T039 [US3] Mapear criterios de aceite para validacao verificavel (TM-003) em specs/002-update-all-specs/acceptance-validation-map.md
+- [x] T040 [US3] Atualizar status formal da especificacao para prontidao de handoff controlado em specs/002-update-all-specs/spec.md
+
+**Checkpoint**: G1/G2/G3/I1 remediados com evidencias documentais explicitas.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -106,6 +120,7 @@
 - Foundational (Phase 2): depende da fase Setup e bloqueia todas as user stories
 - User Stories (Phase 3-5): dependem da conclusao da fase Foundational
 - Polish (Phase 6): depende da conclusao das user stories desejadas
+- Remediation Gate (Phase 7): depende da conclusao de Phase 6 e bloqueia handoff operacional
 
 ### User Story Dependencies
 
@@ -142,6 +157,13 @@
 
 - T021, T022, T023, T024 e T025 podem rodar em paralelo
 - T026 depende de T021-T025
+
+### Remediation Gate
+
+- T036 e T038 podem rodar em paralelo (arquivos diferentes)
+- T037 depende de T036
+- T039 pode rodar em paralelo com T037
+- T040 depende de T036-T039
 
 ---
 

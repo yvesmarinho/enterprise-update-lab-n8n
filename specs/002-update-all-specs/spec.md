@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-update-all-specs`
 **Created**: 2026-03-23
-**Status**: Draft
+**Status**: Ready for Controlled Handoff
 **Input**: User description: "baseado no arquivo do contexto atualize todas as especificações."
 
 ## Clarifications
@@ -10,6 +10,12 @@
 ### Session 2026-03-23
 
 - Q: Como tratar o alvo "latest" durante execução versão a versão? -> A: Resolver latest no planejamento, congelar alvo e só alterar via change-control aprovado.
+
+### Session 2026-03-24
+
+- Q: Como operacionalizar os thresholds de desempenho por checkpoint (CT-002/003/005/006)? -> A: Definir protocolo explicito de baseline, p95, throughput por 15 minutos e regra objetiva de GO/NO-GO em `checkpoint-metrics-protocol.md`.
+- Q: Como formalizar excecao de salto de versao (FR-010)? -> A: Exigir protocolo com justificativa formal, garantia upstream, aprovacao de arquitetura e testes em `version-skip-exception-protocol.md`.
+- Q: Como garantir rastreabilidade de aceite para validacao (TM-003)? -> A: Manter matriz explicita criterio de aceite -> atividade verificavel -> evidencia em `acceptance-validation-map.md`.
 
 ## User Scenarios & Testing *(mandatory)*
 
