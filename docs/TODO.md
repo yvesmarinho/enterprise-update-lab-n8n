@@ -46,6 +46,7 @@
 - [x] Revalidar oficialmente o gate de 15 minutos no hop 2.7.5 (resultado: NO-GO)
 - [x] Executar analise de gap tecnico 2.6.4 -> 2.7.5 para confirmar existencia de migracoes de banco
 - [x] Analisar historico de atualizacoes anteriores e extrair melhor pratica para proxima tentativa
+- [x] Revalidar encerramento da sessao 2026-03-24 sob solicitacao (end.session)
 
 ## 🔵 Pendente (Feature 002)
 

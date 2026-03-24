@@ -44,3 +44,16 @@
 ---
 
 *Arquivo de fechamento da sessao 2026-03-24 gerado no ritual end.session.*
+
+---
+
+## Aditivo — Revalidacao de encerramento
+
+- ✅ Revalidacao executada em 2026-03-24 (solicitacao posterior).
+- ✅ HEAD de referencia da revalidacao: `0b1ee21`.
+- ✅ Estado Git na revalidacao: `clean` e `sync` com `origin/002-update-all-specs`.
+- ✅ Seguranca: nenhuma credencial exposta detectada em arquivos versionados.
+
+### Estado final consolidado
+
+Sessao encerrada e revalidada, pronta para abertura da sessao seguinte com foco em diagnostico do DB init failure no hop para `2.7.5`.

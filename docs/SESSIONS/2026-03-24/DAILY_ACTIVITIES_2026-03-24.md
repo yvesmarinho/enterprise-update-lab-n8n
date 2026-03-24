@@ -156,3 +156,21 @@
 **Resultado**: Sessao fechada documentalmente, com baseline operacional preservada em `2.6.4` e pendencias tecnicas explicitadas para a proxima sessao.
 
 **Status**: ✅ Completo
+
+---
+
+## 16:4x - Revalidacao de encerramento sob demanda (end.session)
+
+**Objetivo**: Reexecutar o ritual de encerramento para confirmar consistencia final de seguranca, documentacao e sincronismo Git.
+
+**Passos executados**:
+
+1. ✅ Releitura dos artefatos de sessao (`DAILY_ACTIVITIES`, `SESSION_REPORT`, `FINAL_STATUS`).
+2. ✅ Nova varredura de seguranca para padroes de credenciais no workspace.
+3. ✅ Confirmacao de protecao de segredos em `.gitignore` (`.secrets/`, `.env*`, chaves e certificados).
+4. ✅ Validacao de estado Git com branch sincronizada ao remoto (`clean` e `sync`).
+5. ✅ Registro incremental desta revalidacao para rastreabilidade de fechamento.
+
+**Resultado**: Encerramento revalidado com sucesso, sem novas nao conformidades no escopo versionado.
+
+**Status**: ✅ Completo
