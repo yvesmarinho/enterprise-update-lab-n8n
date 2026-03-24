@@ -36,6 +36,38 @@ Sessão iniciada para continuidade da governança e validação final de consist
 - ✅ Nenhuma ocorrencia local de `n8n_devb_db` encontrada no workspace.
 - ✅ Fluxo retomado a partir do ponto interrompido.
 
+### 4. Inicio operacional do checkpoint 1
+
+- ✅ Ambiente controlado validado em `wfdb01:/opt/docker_user/n8n`.
+- ✅ Nome de banco runtime confirmado como `n8n_dev_db`.
+- ✅ Janela inicial de 15 minutos coletada para o gate de baseline.
+- ⚠️ Decisao de gate do CP-001-BASELINE: NO-GO (erros criticos e metricas nao confiaveis para promocao).
+
+### 5. Registro de erros persistentes e inicio da atualizacao
+
+- ✅ Recheck de 15 minutos com `critical_error_count=0`.
+- ✅ Relacao de versoes de upgrade consolidada para a rodada.
+- ✅ Kickoff do processo de update iniciado no primeiro hop (`2.6.4 -> 2.7.5`).
+- ✅ Runbook operacional para aplicacao em producao criado.
+- ⚠️ Confirmacao objetiva da versao pos-hop permanece pendente por intermitencia de captura de saida no terminal.
+
+### 6. Correcao de padrao SSH, gate do hop e rollback
+
+- ✅ Execucao remota padronizada para `~/.local/bin/ssh-wfdb01` conforme `.secrets/ssh.json`.
+- ✅ Confirmacao objetiva da tentativa de hop em `2.7.5`.
+- ⚠️ Gate do hop reprovado: `ERRORS_2M=24`, `ERRORS_15M=36`.
+- ⚠️ Erro predominante: `There was an error initializing DB`.
+- ✅ Rollback completo executado para `2.6.4` com uso de `sudo` no compose.
+- ✅ Ambiente pos-rollback estabilizado (`ERRORS_2M=0`, `ERRORS_15M=0`).
+
+### 7. Revalidacao oficial do gate 2.7.5
+
+- ✅ Nova tentativa controlada em `2.7.5` com janela oficial de validacao.
+- ✅ Pre-gate curto com `ERRORS_2M=0`.
+- ⚠️ Gate oficial reprovado: `ERRORS_15M=20`.
+- ✅ Rollback imediato executado para `2.6.4`.
+- ✅ Estado final atual: baseline estavel em `2.6.4` com `ERRORS_2M=0`.
+
 ---
 
 ## Riscos e Pontos de Atenção
@@ -48,9 +80,9 @@ Sessão iniciada para continuidade da governança e validação final de consist
 
 ## Próximas Ações
 
-1. Iniciar checkpoints operacionais reais em ambiente controlado.
-2. Coletar evidencias runtime (baseline, p95, throughput, rollback drill) por checkpoint.
-3. Atualizar status final da sessao com evidencias da primeira transicao.
+1. Investigar causa raiz de inicializacao de DB na versao 2.7.5.
+2. Definir ajuste de pre-check antes de nova tentativa do hop.
+3. Planejar nova tentativa controlada do hop com criterio de abort precoce e coleta de stack trace completa.
 
 ---
 

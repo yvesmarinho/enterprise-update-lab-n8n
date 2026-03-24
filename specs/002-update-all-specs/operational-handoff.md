@@ -41,4 +41,4 @@ Handoff da feature documental para preparacao de execucao operacional controlada
 ## Owner and Next Action
 
 - Owner: equipe de governanca/execucao da feature 002.
-- Next action: remediar bloqueios e revalidar prontidao antes de qualquer transicao operacional.
+- Next action: iniciar checkpoint operacional 1 e registrar evidencias reais de baseline, p95, throughput e rollback drill.

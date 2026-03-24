@@ -1,0 +1,167 @@
+# Versão docker dev
+# https://github.com/n8n-io/n8n/blob/master/docker/compose/withPostgresAndWorker/docker-compose.yml
+# versão: latest
+# Modifications.....:
+# Date          Rev    Author                 Description
+# 20/03/2025     0     Yves Marinho/Vanderson Inicio 1.82.1
+# 28/03/2025     0     Yves Marinho/Vanderson Inicio 1.82.3
+# 28/03/2025     0     Yves Marinho/Vanderson Inicio 1.83.2
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.84.3
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.85.4
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.86.1
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.88.0
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.89.2
+# 25/04/2025     0     Yves Marinho/Vanderson Inicio 1.90.1
+# 09/05/2025     0     Vanderson              Inicio 1.90.2
+# 09/05/2025     0     Vanderson              Router específico para /mcp (sem GZIP) No Editor - PRIORIDADE MAIOR
+# 09/05/2025     0     Vanderson              Inicio 1.91.3
+# 07/06/2025     0     Vanderson              alterado a versao 1.91.3 => 1.93.0
+# 07/06/2025     0     Vanderson              alterado a versao 1.93.0 => 1.94.1
+# 07/06/2025     0     Vanderson              alterado a versao 1.94.1 => 1.95.3
+# 21/06/2025     0     Vanderson              alterado a versao 1.95.3 => 1.97.1
+# 16/07/2025     0     Vanderson              alterado a versao 1.97.1 => 1.98.2
+# 16/07/2025     0     Vanderson              alterado a versao 1.98.2 => 1.99.1
+# 16/07/2025     0     Vanderson              alterado a versao 1.99.1 => 1.100.1
+# 16/07/2025     0     Vanderson              alterado a versao 1.100.1 => 1.101.2
+# 16/07/2025     0     Vanderson              alterado a versao 1.101.2 => 1.102.3
+# 27/07/2025     0     Vanderson              alterado a versao 1.102.3 => 1.102.4
+# 27/07/2025     0     Vanderson              alterado a versao 1.102.4 => 1.103.2
+# 03/08/2025     0     Vanderson              alterado a versao 1.103.2 => 1.104.2
+# 24/08/2025     0     Vanderson              alterado a versao 1.104.2 => 1.105.4
+# 24/08/2025     0     Vanderson              alterado a versao 1.105.4 => 1.106.3
+# 24/08/2025     0     Vanderson              alterado a versao 1.106.3 => 1.107.4
+# 22/09/2025     0     Vanderson              alterado a versao 1.107.4 => 1.108.2
+# 22/09/2025     0     Vanderson              alterado a versao 1.108.2 => 1.109.2
+# 22/09/2025     0     Vanderson              alterado a versao 1.109.2 => 1.110.1
+# 22/09/2025     0     Vanderson              alterado a versao 1.110.1 => 1.111.1
+# 22/09/2025     0     Vanderson              alterado a versao 1.111.1 => 1.112.3
+# 30/09/2025     0     Vanderson              alterado a versao 1.112.3 => 1.112.6
+# 30/09/2025     0     Vanderson              alterado a versao 1.112.6 => 1.113.3
+# 26/10/2025     0     Vanderson              alterado a versao 1.113.3 => 1.114.4
+# 26/10/2025     0     Vanderson              alterado a versao 1.114.4 => 1.115.3
+# 26/10/2025     0     Vanderson              alterado a versao 1.115.3 => 1.116.2
+# 26/10/2025     0     Vanderson              alterado a versao 1.116.2 => 1.117.3
+# 26/10/2025     0     Vanderson              alterado a versao 1.117.3 => 1.118.2
+# 22/11/2025     0     Vanderson              alterado a versao 1.118.2 => 1.119.2
+# 22/11/2025     0     Vanderson              alterado a versao 1.119.2 => 1.120.4
+# 26/12/2025     0     Vanderson              alterado a versao 1.120.4 => 1.121.3
+# 26/12/2025     0     Vanderson              alterado a versao 1.121.3 => 1.122.5
+# 26/12/2025     0     Vanderson              alterado a versao 1.122.5 => 1.123.6
+# 26/12/2025     0     Vanderson              alterado a versao 1.123.6 => 2.0.3
+# 26/12/2025     0     Vanderson              alterado a versao 2.0.3 => 2.1.4
+# 05/01/2026     0     Vanderson              alterado a versao 2.1.4 => 2.1.5
+# 05/01/2026     0     Vanderson              alterado a versao 2.1.5 => 2.2.3
+# 05/01/2026     0     Vanderson              alterado a versao 2.2.3 => 2.3.0
+# 06/02/2026     0     Vanderson              alterado a versao 2.3.0 => 2.3.6
+# 06/02/2026     0     Vanderson              alterado a versao 2.3.6 => 2.4.8
+# 06/02/2026     0     Vanderson              alterado a versao 2.4.8 => 2.6.4
+
+x-n8n-common: &n8n-common
+  image: n8nio/n8n:2.6.4
+  env_file:
+    - "./.env"
+  restart: always
+  networks:
+    - app-network
+
+services:
+  n8n_editor:
+    <<: *n8n-common
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n_editor.tls=true"
+      - "traefik.http.routers.n8n_editor.rule=Host(`testn8n.vya.digital`)"
+      - "traefik.http.routers.n8n_editor.entrypoints=websecure"
+      - "traefik.http.routers.n8n_editor.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.n8n_editor.middlewares=n8n_editor@docker"
+      - "traefik.http.middlewares.n8n_editor.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.n8n_editor.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.n8n_editor.headers.browserXSSFilter=true"
+      - "traefik.http.middlewares.n8n_editor.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.n8n_editor.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.n8n_editor.headers.SSLHost=vya.digital"
+      - "traefik.http.middlewares.n8n_editor.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.n8n_editor.headers.STSPreload=true"
+      - "traefik.http.services.n8n_editor.loadbalancer.sticky=true"
+      - "traefik.http.services.n8n_editor.loadbalancer.server.port=5678"
+    environment:
+      - UID=2002
+      - GID=2002
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - "/opt/docker_user/n8n/n8n_storage/:/home/node/.n8n/"
+
+  n8n_webhook:
+    <<: *n8n-common
+    command: webhook --thread=12 # Número de threads para processar webhooks simultâneos
+    depends_on:
+      - n8n_editor
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n_webhook.tls=true"
+      - "traefik.http.routers.n8n_webhook.rule=Host(`weblinker2.vya.digital`)"
+      - "traefik.http.routers.n8n_webhook.entrypoints=websecure"
+      - "traefik.http.routers.n8n_webhook.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.n8n_webhook.middlewares=n8n_webhook@docker"
+      - "traefik.http.middlewares.n8n_webhook.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.n8n_webhook.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.n8n_webhook.headers.browserXSSFilter=true"
+      - "traefik.http.middlewares.n8n_webhook.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.n8n_webhook.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.n8n_webhook.headers.SSLHost=vya.digital"
+      - "traefik.http.middlewares.n8n_webhook.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.n8n_webhook.headers.STSPreload=true"
+      - "traefik.http.services.n8n_webhook.loadbalancer.sticky=false"
+      - "traefik.http.services.n8n_webhook.loadbalancer.server.port=5678"
+    environment:
+      - UID=2002
+      - GID=2002
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - "/opt/docker_user/n8n/n8n_storage/:/home/node/.n8n/"
+
+  n8n_mcp:
+    <<: *n8n-common
+    command: webhook
+    depends_on:
+      - n8n_editor
+    labels:
+      - "traefik.enable=true"
+      - 'traefik.http.middlewares.nogzip.headers.customResponseHeaders.Content-Encoding=""'
+      - "traefik.http.routers.n8n_mcp.rule=(Host(`weblinker2.vya.digital`) && PathPrefix(`/mcp`))"
+      - "traefik.http.routers.n8n_mcp.entrypoints=websecure"
+      - "traefik.http.routers.n8n_mcp.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.n8n_mcp.service=n8n_mcp"
+      - "traefik.http.services.n8n_mcp.loadbalancer.server.port=5678"
+      - "traefik.http.services.n8n_mcp.loadbalancer.passHostHeader=true"
+      - "traefik.http.routers.n8n_mcp.middlewares=nogzip"
+    environment:
+      - UID=2002
+      - GID=2002
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - "/opt/docker_user/n8n/n8n_storage/:/home/node/.n8n/"
+
+  n8n_worker:
+    <<: *n8n-common
+    command: worker --concurrency=12
+    depends_on:
+      - n8n_editor
+    environment:
+      - UID=2002
+      - GID=2002
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - "/opt/docker_user/n8n/n8n_storage/:/home/node/.n8n/"
+
+networks:
+  app-network:
+    external: true

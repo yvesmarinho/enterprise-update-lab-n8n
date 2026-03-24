@@ -39,6 +39,8 @@ SESSIONS/
 - [specs/002-update-all-specs/tasks.md](../specs/002-update-all-specs/tasks.md)
 - [specs/002-update-all-specs/traceability-matrix.md](../specs/002-update-all-specs/traceability-matrix.md)
 - [specs/002-update-all-specs/validation-report.md](../specs/002-update-all-specs/validation-report.md)
+- [specs/002-update-all-specs/VERSION_UPGRADE_RELATION_2026-03-24.md](../specs/002-update-all-specs/VERSION_UPGRADE_RELATION_2026-03-24.md)
+- [docs/RUNBOOK_PRODUCAO_N8N.md](RUNBOOK_PRODUCAO_N8N.md)
 
 ## Sessao 2026-03-23
 
