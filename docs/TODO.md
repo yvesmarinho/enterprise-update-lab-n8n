@@ -16,7 +16,8 @@
 - [ ] Executar novo hop intermediario `2.6.4 -> 2.7.0` (gate de 15 minutos)
 - [ ] Se GO no hop intermediario, executar `2.7.0 -> 2.7.5` (gate de 15 minutos)
 - [ ] Consolidar amostra quantitativa final (p95/throughput) para o proximo gate de tentativa
-- [ ] Preparar fechamento final da sessão 2026-03-24 com evidências operacionais válidas
+- [x] Preparar fechamento final da sessão 2026-03-24 com evidências operacionais válidas
+- [ ] Abrir sessão 2026-03-25 com plano de investigação de DB init failure no hop 2.7.5
 
 ## 🔵 Pendente
 

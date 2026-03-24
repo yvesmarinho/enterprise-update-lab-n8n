@@ -41,3 +41,9 @@ com precedência de tags oficiais e fallback em release notes oficiais.
 Cada checkpoint deve usar janela oficial de 15 minutos com decisão GO/NO-GO
 baseada em thresholds objetivos (workflows críticos 100%, erro crítico = 0,
 regressão p95 <= 10% e throughput >= 90% do baseline).
+
+## 📌 Status Operacional (2026-03-24)
+
+- Baseline validada: `n8nio/n8n:2.6.4` (estavel apos rollback).
+- Tentativa de hop `2.6.4 -> 2.7.5`: NO-GO em gate oficial de 15 minutos por falha de inicializacao de DB.
+- Proxima retomada: investigacao de causa raiz e nova tentativa controlada com pre-check reforcado.
