@@ -1,15 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 1.1.0 -> 1.2.0
 - Modified principles:
-  - PRINCIPLE_1_NAME -> I. Specification-Driven Delivery (SDD)
-  - PRINCIPLE_2_NAME -> II. Upgrade Safety and Mandatory Rollback
-  - PRINCIPLE_3_NAME -> III. Compatibility and Data Integrity Gates
-  - PRINCIPLE_4_NAME -> IV. Risk-Based Validation Evidence
-  - PRINCIPLE_5_NAME -> V. End-to-End Traceability and Incremental Documentation
+  - I. Specification-Driven Delivery (SDD) -> I. Specification-Driven Delivery (SDD)
+  - II. Upgrade Safety and Mandatory Rollback -> II. Upgrade Safety and Mandatory Rollback
+  - III. Compatibility and Data Integrity Gates -> III. Compatibility and Data Integrity Gates
+  - IV. Risk-Based Validation Evidence -> IV. Metric-Based Validation Evidence
+  - V. End-to-End Traceability and Incremental Documentation -> V. End-to-End Traceability and Incremental Documentation
 - Added sections:
-  - Operational Constraints and Security Baseline
-  - Workflow, Roles, and Approval Gates
+  - Execution Model and Rollout Waves
 - Removed sections:
   - None
 - Templates requiring updates:
@@ -43,6 +42,9 @@ guarantee is documented and approved by architecture and testing gates.
 Resolution of latest MUST prioritize official n8n release tags, using official
 release notes only as explicit fallback with recorded source URL, timestamp,
 and resolved version.
+Image pull operations MUST use bounded retry with timeout and MUST block deploy
+when local digest validation fails. Recreate/deploy without validated local image
+availability is forbidden.
 Rationale: upgrade failure must not compromise service continuity or recoverability.
 
 ### III. Compatibility and Data Integrity Gates
@@ -52,12 +54,15 @@ image/runtime, volumes, database, credentials, queues, and critical workflows.
 Data integrity and credential continuity are non-negotiable gates. Rationale:
 technical success is invalid if integrations or persistent data are degraded.
 
-### IV. Risk-Based Validation Evidence
+### IV. Metric-Based Validation Evidence
 
 Release decisions MUST be supported by reproducible evidence: pre-check outputs,
 functional validation of critical workflows, post-check metrics, and explicit
-go/no-go results. Rationale: evidence-first validation reduces subjective approvals
-and supports safe operational decisions.
+go/no-go results. Each checkpoint MUST evaluate a 15-minute validation window with
+all mandatory thresholds met: 100% critical workflow pass, critical errors equal
+to 0, p95 regression less than or equal to 10%, and throughput greater than or
+equal to 90% of baseline. Missing or incomplete evidence MUST force NO-GO.
+Rationale: objective thresholds reduce ambiguous decisions and false confidence.
 
 ### V. End-to-End Traceability and Incremental Documentation
 
@@ -73,7 +78,22 @@ auditability, and reliable session recovery.
   `.secrets/` with environment-variable indirection where applicable.
 - MCP usage MUST follow the documented flow:
   `objetivo.yaml -> Copilot -> mcp-questions.yaml -> MCP`.
-- Python and Ansible are the required automation stack for this project scope.
+- The required execution model is hybrid: Ansible executes idempotent remote
+  operations and rollback, while Python controls version planning, gate decisions,
+  and evidence/report generation.
+
+## Execution Model and Rollout Waves
+
+- Upgrade automation MUST execute per checkpoint state machine:
+  `PRECHECK -> BACKUP -> PULL -> DEPLOY -> VALIDATE -> GATE`.
+- Rollout governance MUST follow waves in this order:
+  1. Onda 0 (governance and baseline)
+  2. Onda 1 (automation base)
+  3. Onda 2 (version-by-version in homolog)
+  4. Onda 3 (controlled production canary)
+  5. Onda 4 (scale and operational handoff)
+- Promotion between waves MUST require explicit GO approval based on checkpoint
+  evidence and rollback readiness from the previous wave.
 
 ## Workflow, Roles, and Approval Gates
 
@@ -106,4 +126,4 @@ Compliance review expectations:
 - Every intermediate version step MUST have checkpoint evidence before advancing.
 - Reviews MUST reject changes that violate non-negotiable principles.
 
-**Version**: 1.1.0 | **Ratified**: 2026-03-20 | **Last Amended**: 2026-03-23
+**Version**: 1.2.0 | **Ratified**: 2026-03-20 | **Last Amended**: 2026-03-24

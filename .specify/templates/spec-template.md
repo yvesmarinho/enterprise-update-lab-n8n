@@ -110,10 +110,22 @@
 - **CT-001**: Functional compatibility per checkpoint MUST approve 100% of
   critical workflows.
 - **CT-002**: Performance regression per checkpoint MUST be <= 10% against
-  baseline.
-- **CT-003**: Critical errors MUST be 0 for go decision.
-- **CT-004**: Backup, restore, and evidence artifacts MUST be complete before
-  release.
+  baseline in a 15-minute validation window.
+- **CT-003**: Throughput per checkpoint MUST be >= 90% of baseline in a
+  15-minute validation window.
+- **CT-004**: Critical errors MUST be 0 for go decision.
+- **CT-005**: Backup, restore drill, and evidence artifacts MUST be complete
+  before release.
+
+### Execution Model Constraints *(mandatory for automation design)*
+
+- **EMC-001**: Plans MUST define the hybrid execution model where Ansible handles
+  idempotent remote operations and rollback, and Python handles version planning,
+  gate decisions, and evidence/report generation.
+- **EMC-002**: The checkpoint state machine MUST be explicit:
+  `PRECHECK -> BACKUP -> PULL -> DEPLOY -> VALIDATE -> GATE`.
+- **EMC-003**: Pull/deploy logic MUST define retry, timeout, and local digest
+  validation safeguards.
 
 ### Traceability Matrix *(mandatory)*
 

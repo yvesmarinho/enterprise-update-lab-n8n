@@ -167,6 +167,13 @@ Examples of foundational tasks (adjust based on your project):
   integrations, critical workflows)
 - [ ] TXXX Register canonical latest source, precedence, and timestamp in planning artifacts
 - [ ] TXXX Record baseline and checkpoint performance metrics (p95 and throughput)
+- [ ] TXXX Validate 15-minute checkpoint thresholds (critical errors = 0,
+  p95 regression <= 10%, throughput >= 90% of baseline)
+- [ ] TXXX Implement hybrid execution split (Ansible remote idempotent/rollback,
+  Python planning/gates/evidence)
+- [ ] TXXX Define pull safeguards (retry, timeout, local digest validation,
+  and deploy block when image validation fails)
+- [ ] TXXX Execute and record rollback drill per checkpoint before promotion
 - [ ] TXXX Update traceability links from requirements -> tasks -> evidence
 
 ---

@@ -32,7 +32,12 @@ Consulte os [documentos de arquitetura](docs/) para detalhes.
 Este projeto segue o fluxo Speckit `constitution -> plan -> tasks -> implement`.
 Os gates de segurança, rollback, compatibilidade e evidências são definidos na
 constituição e devem ser atendidos antes de avançar de fase.
+O modelo de execução mandatado é híbrido: Ansible para operações remotas
+idempotentes/rollback e Python para planejamento de versões, gates e evidências.
 As atualizações de n8n devem ser executadas de forma sequencial, versão a versão,
 partindo da 2.6.4 até a última disponível, sem salto entre versões intermediárias.
 O alvo derivado de latest deve ser resolvido e congelado por rodada no plano,
 com precedência de tags oficiais e fallback em release notes oficiais.
+Cada checkpoint deve usar janela oficial de 15 minutos com decisão GO/NO-GO
+baseada em thresholds objetivos (workflows críticos 100%, erro crítico = 0,
+regressão p95 <= 10% e throughput >= 90% do baseline).

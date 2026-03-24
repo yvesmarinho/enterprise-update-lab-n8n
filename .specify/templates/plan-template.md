@@ -38,9 +38,13 @@
 - Compatibility Coverage: Plan includes checks for runtime/image, storage/DB,
   credentials, queues/integrations, and critical workflows.
 - Validation Evidence: Plan defines objective evidence outputs for go/no-go
-  decisions (pre-check, post-check, functional and performance validation).
+  decisions (pre-check, post-check, functional and performance validation)
+  including 15-minute checkpoint windows and threshold rules.
 - Incremental Documentation: Plan defines which docs are updated incrementally
   during execution and how trace links are preserved.
+- Hybrid Execution Model: Plan defines Ansible execution scope (idempotent remote
+  operations and rollback) and Python scope (version planning, gate engine,
+  and evidence/report generation).
 
 Pre-Design Gate Status:
 
@@ -49,6 +53,7 @@ Pre-Design Gate Status:
 - Compatibility Coverage: [PASS|FAIL]
 - Validation Evidence: [PASS|FAIL]
 - Incremental Documentation: [PASS|FAIL]
+- Hybrid Execution Model: [PASS|FAIL]
 
 Post-Design Gate Status:
 
@@ -57,6 +62,7 @@ Post-Design Gate Status:
 - Compatibility Coverage: [PASS|FAIL]
 - Validation Evidence: [PASS|FAIL]
 - Incremental Documentation: [PASS|FAIL]
+- Hybrid Execution Model: [PASS|FAIL]
 
 ## Project Structure
 
