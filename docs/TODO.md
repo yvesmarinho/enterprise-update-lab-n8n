@@ -1,23 +1,30 @@
 # 📝 TODO — Enterprise Update Lab N8N
 
-**Last Updated**: 2026-03-24
+**Last Updated**: 2026-03-25
 **Status**: 🟢 Em andamento
 
 ---
 
 ## 🟠 Em Progresso
 
+- [x] Transformar pendencias herdadas em plano operacional objetivo da sessao 2026-03-25
+- [x] Iniciar stack n8n no host remoto e validar saude curta sem erros criticos
+- [x] Rebaselinar trilha operacional para runtime atual `2.13.2` antes de novo hop
+- [ ] Executar hop controlado `2.13.2 -> 2.13.3` com gate oficial de 15 minutos
 - [ ] Analisar causa raiz de `There was an error initializing DB` no hop 2.7.5
 - [ ] Definir correcao/pre-check adicional antes de nova tentativa do hop 2.7.5
 - [x] Validar permissao DDL (CREATE/ALTER/INDEX) do usuario efetivo do n8n no schema alvo
 - [ ] Validar estado da tabela de migracoes e ultimo migration id aplicado na baseline 2.6.4
 - [ ] Executar tentativa controlada com captura completa de stacktrace de inicializacao de DB
 - [ ] Revisar alinhamento minimo do compose com referencia oficial `n8n-hosting/withPostgresAndWorker`
-- [ ] Executar novo hop intermediario `2.6.4 -> 2.7.0` (gate de 15 minutos)
-- [ ] Se GO no hop intermediario, executar `2.7.0 -> 2.7.5` (gate de 15 minutos)
+- [ ] Executar pre-check reforcado (DB, migracoes, compose, prontidao de rollback)
+- [ ] Validar baseline de metricas da rodada (p95, throughput, critical_error_count)
+- [ ] Executar hop intermediario `2.6.4 -> 2.7.0` e aplicar gate oficial de 15 minutos
+- [ ] Se GO no hop intermediario, executar `2.7.0 -> 2.7.5` e aplicar gate oficial de 15 minutos
+- [ ] Em caso de NO-GO, executar rollback imediato e consolidar evidencia tecnica do bloqueio
 - [ ] Consolidar amostra quantitativa final (p95/throughput) para o proximo gate de tentativa
 - [x] Preparar fechamento final da sessão 2026-03-24 com evidências operacionais válidas
-- [ ] Abrir sessão 2026-03-25 com plano de investigação de DB init failure no hop 2.7.5
+- [x] Abrir sessão 2026-03-25 com plano de investigação de DB init failure no hop 2.7.5
 
 ## 🔵 Pendente
 
