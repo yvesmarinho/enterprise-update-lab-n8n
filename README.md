@@ -27,14 +27,28 @@ Ambiente de referencia para validacao:
 
 ---
 
-## Status Atual (2026-03-25)
+## Status Atual (2026-04-29)
 
-1. Baseline valida em runtime 2.6.4 apos rollback controlado.
-2. Hop 2.6.4 -> 2.7.5 permanece NO-GO em janela oficial de 15 minutos.
-3. Bloqueio principal: erro de inicializacao de banco durante startup do hop 2.7.5.
-4. Proxima etapa: investigacao de causa raiz e nova tentativa controlada com pre-check reforcado.
+### Lab (wfdb01) — ✅ ATUALIZADO
+- **Versão N8N**: 2.19.1 (latest, released 2026-04-29)
+- **Trilha completada**: 2.13.2 → 2.19.1 (8 hops, 100% sucesso)
+- **Status**: ✅ Todos containers UP e saudáveis
+- **Validação**: N8N ativo, workflows error-free
+- **Próxima etapa**: Validação funcional extensiva (workflows críticos, performance, integrações)
 
-Para trilha diaria, consulte as sessoes em docs/SESSIONS.
+### Produção — ⏳ PENDENTE
+- **Versão N8N**: 2.6.4 (baseline original)
+- **Trilha planejada**: 2.6.4 → 2.19.1 (13 hops, trilha completa)
+- **Status**: Aguardando validação completa no Lab
+- **Bloqueio anterior**: Hop 2.6.4 → 2.7.5 teve DB init failure (necessita investigação)
+
+Para trilha diária completa, consulte as sessões em [docs/SESSIONS/](docs/SESSIONS/).
+
+### Histórico de Sessões Recentes
+- **2026-04-29**: Upgrade Lab completo 2.13.2 → 2.19.1 (8 hops) ✅
+- **2026-04-03**: Tentativas hop 2.7.5 (NO-GO)
+- **2026-03-25**: Investigação DB init failure
+- **2026-03-24**: Análise cruzada specs e execução CP-001
 
 ---
 
