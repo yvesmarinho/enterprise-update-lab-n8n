@@ -30,18 +30,82 @@ Exemplo de execucao padrao:
 4. Aprovadores de gate definidos (tecnico e negocio).
 5. Plano de rollback testado (drill ou simulacao validada).
 
-## Trilha de versoes recomendada para esta rodada
+## Trilhas de Upgrade Disponíveis
+
+### 🏭 Trilha COMPLETA — Para Produção (2.6.4 → 2.19.1)
+
+**Ambiente**: Produção (versão atual: 2.6.4)
+**Quando executar**: Após validação completa da trilha complementar no laboratório
+**Total de hops**: 13
+**Tempo estimado**: ~195 minutos (15 min/hop)
+**⚠️ CRÍTICO**: Deve percorrer TODAS as versões intermediárias, sem pular
+
+```
+2.6.4  → 2.7.5  → 2.8.4  → 2.9.4  → 2.10.4 → 2.11.4 → 2.12.3 →
+2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1
+```
+
+**Séries cobertas**:
+- 2.6 (5 versões) → 2.7 (6 versões) → 2.8 (5 versões) → 2.9 (5 versões)
+- 2.10 (5 versões) → 2.11 (5 versões) → 2.12 (4 versões) → 2.13 (5 versões)
+- 2.14 (3 versões) → 2.15 (2 versões) → 2.16 (3 versões) → 2.17 (9 versões)
+- 2.18 (6 versões) → 2.19 (2 versões)
+
+---
+
+### 🔬 Trilha COMPLEMENTAR — Para Laboratório (2.13.2 → 2.19.1)
+
+**Ambiente**: Laboratório wfdb01 (versão atual: 2.13.2)
+**Quando executar**: AGORA (validação das versões mais recentes)
+**Total de hops**: 8
+**Tempo estimado**: ~120 minutos (15 min/hop)
+**Objetivo**: Validar versões 2.14-2.19 antes de aplicar trilha completa em produção
+
+```
+2.13.2 → 2.13.3 → 2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1
+```
+
+---
+
+### Trilha Histórica — Já Executada no Lab (2.6.4 → 2.13.2)
+
+**Período**: Março 2026
+**Status**: ✅ Completada até 2.13.2 (validado 2026-03-25)
+**Ambiente**: Laboratório wfdb01
 
 1. 2.6.4 -> 2.7.0
 2. 2.7.0 -> 2.7.5
 3. 2.7.5 -> 2.8.4
 4. 2.8.4 -> 2.9.4
-5. 2.9.4 -> 2.10.4
+5. 2.9.4 -> 2.10.4 ⚠️ **BLOQUEADO** (pull não concluiu)
 6. 2.10.4 -> 2.11.4
 7. 2.11.4 -> 2.12.3
-8. 2.12.3 -> 2.13.2
+8. 2.12.3 -> 2.13.2 ✅ **BASELINE ATUAL** (validado 2026-03-25)
 
-## Procedimento por checkpoint
+### Trilha Histórica — Já Executada no Lab (2.6.4 → 2.13.2)
+
+**Período**: Março 2026
+**Status**: ✅ Completada até 2.13.2 (validado 2026-03-25)
+**Ambiente**: Laboratório wfdb01
+
+**Hops executados**:
+1. 2.6.4 → 2.7.0
+2. 2.7.0 → 2.7.5
+3. 2.7.5 → 2.8.4
+4. 2.8.4 → 2.9.4
+5. 2.9.4 → 2.10.4 ⚠️ **Bloqueio temporário** (pull não concluiu, resolvido)
+6. 2.10.4 → 2.11.4
+7. 2.11.4 → 2.12.3
+8. 2.12.3 → 2.13.2 ✅ **Baseline lab validado**
+
+**Observações**:
+- Procedimento de rollback testado e validado
+- ⚠️ Esta validação foi feita no LABORATÓRIO, NÃO em produção
+- Produção permanece em 2.6.4
+
+---
+
+## Procedimento por Checkpoint
 
 ### 1. Pre-check
 
