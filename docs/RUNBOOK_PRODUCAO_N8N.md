@@ -1,5 +1,20 @@
 # RUNBOOK PRODUCAO N8N
 
+## Histórico de Versões
+
+| Versão | Data | Autor | Descrição |
+|--------|------|-------|-----------|
+| 1.0 | 2026-03-24 | Sistema | Versão inicial - Trilha 2.6.4 → 2.13.2 executada no Lab |
+| 1.1 | 2026-04-29 | Sistema | Atualização trilha complementar 2.13.2 → 2.19.1 (Lab) |
+| 1.2 | 2026-05-02 | Sistema | Análise de falha HOP 1A em Produção - schema contaminado |
+| 1.3 | 2026-05-04 | Sistema | Procedimento de limpeza de schema PostgreSQL |
+
+**Versão atual**: 1.3
+**Última atualização**: 2026-05-04
+**Status**: Produção bloqueada em 2.6.4 | Lab em 2.19.1
+
+---
+
 ## Objetivo
 
 Padronizar a aplicacao do processo de upgrade do n8n em producao com seguranca, rastreabilidade e rollback controlado.
@@ -29,6 +44,7 @@ Exemplo de execucao padrao:
 3. Lista de workflows criticos para validacao funcional.
 4. Aprovadores de gate definidos (tecnico e negocio).
 5. Plano de rollback testado (drill ou simulacao validada).
+6. **🔴 CRÍTICO**: Schema PostgreSQL limpo (sem tabelas órfãs) - ver seção "Limpeza de Schema".
 
 ## Trilhas de Upgrade Disponíveis
 
@@ -104,7 +120,193 @@ Exemplo de execucao padrao:
 - Produção permanece em 2.6.4
 
 ---
+🔴 Limpeza de Schema PostgreSQL (OBRIGATÓRIO ANTES DO UPGRADE)
 
+### Contexto
+
+**Problema identificado em 2026-05-02**:
+- Tentativa de upgrade 2.6.4 → 2.7.0 em Produção FALHOU
+- Erro: `There was an error initializing DB`
+- Causa raiz: Tabela órfã `secrets_provider_connection` contaminando schema
+
+**Origem da contaminação**:
+- Upgrade parcial anterior deixou tabela no schema
+- Tabela não está rastreada pelo TypeORM da versão 2.6.4
+- Migração 2.7.0 tenta criar a tabela, mas ela já existe
+
+### Diagnóstico Executado (2026-05-04)
+
+**Ferramentas**:
+- Script: `.tmp/diagnostico_secrets_provider_connection.py`
+- Driver: `psycopg2-binary`
+
+**Resultados**:
+
+| Tabela | Registros | Referências | Status |
+|--------|-----------|-------------|--------|
+| `secrets_provider_connection` | 0 (vazia) | 1 tabela dependente | ⚠️ Contaminada |
+| `project_secrets_provider_access` | 0 (vazia) | FK → secrets_provider_connection | ⚠️ Dependente |
+
+**Estrutura da tabela órfã**:
+```sql
+CREATE TABLE secrets_provider_connection (
+    id INTEGER PRIMARY KEY,
+    "providerKey" VARCHAR(128) UNIQUE NOT NULL,
+    type VARCHAR(36) NOT NULL,
+    "encryptedSettings" TEXT NOT NULL,
+    "isEnabled" BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP(3),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP(3)
+);
+```
+
+**Análise de impacto**:
+- ✅ Ambas as tabelas estão VAZIAS (0 registros)
+- ✅ Nenhum workflow utiliza estas tabelas
+- ✅ Nenhum dado será perdido com DROP CASCADE
+- ✅ **SEGURO para remoção**
+
+### Procedimento de Limpeza
+
+**⚠️ ATENÇÃO**: Executar ANTES de qualquer tentativa de upgrade
+
+#### Passo 1: Conectar ao PostgreSQL
+
+```bash
+# Via SSH no host wfdb01
+~/.local/bin/ssh-wfdb01
+
+# Conectar ao PostgreSQL como usuário administrativo
+psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db
+```
+
+**Credenciais** (de `.secrets/.env`):
+- Host: `82.197.64.145`
+- Port: `5432`
+- Database: `n8n_dev_db`
+- User admin: `n8n_admin`
+- Password: `REDACTED_ADMIN_PASSWORD`
+
+#### Passo 2: Verificar existência da tabela
+
+```sql
+-- Confirmar que a tabela existe
+SELECT tablename, schemaname
+FROM pg_tables
+WHERE tablename = 'secrets_provider_connection';
+
+-- Verificar se há dados (deve retornar 0)
+SELECT COUNT(*) FROM secrets_provider_connection;
+
+-- Verificar tabela dependente
+SELECT COUNT(*) FROM project_secrets_provider_access;
+```
+
+**Resultado esperado**:
+- `secrets_provider_connection`: 0 registros
+- `project_secrets_provider_access`: 0 registros
+
+#### Passo 3: Executar limpeza
+
+```sql
+-- BACKUP: Documentar estado antes da limpeza
+SELECT
+    tc.table_name,
+    tc.constraint_name,
+    tc.constraint_type
+FROM information_schema.table_constraints tc
+WHERE tc.table_name IN ('secrets_provider_connection', 'project_secrets_provider_access');
+
+-- EXECUTAR LIMPEZA
+DROP TABLE IF EXISTS secrets_provider_connection CASCADE;
+
+-- COMMIT (se estiver em transação)
+COMMIT;
+```
+
+**Efeito do CASCADE**:
+- Remove a tabela `secrets_provider_connection`
+- Remove automaticamente a foreign key de `project_secrets_provider_access`
+- A tabela `project_secrets_provider_access` permanece, mas sem a constraint
+
+#### Passo 4: Validar limpeza
+
+```sql
+-- Confirmar remoção (deve retornar 0 linhas)
+SELECT tablename
+FROM pg_tables
+WHERE tablename = 'secrets_provider_connection';
+
+-- Verificar que tabela dependente ainda existe
+SELECT tablename
+FROM pg_tables
+WHERE tablename = 'project_secrets_provider_access';
+
+-- Confirmar que foreign key foi removida
+SELECT
+    tc.constraint_name,
+    tc.table_name
+FROM information_schema.table_constraints tc
+WHERE tc.constraint_name = 'FK_18e5c27d2524b1638b292904e48';
+-- Deve retornar 0 linhas
+```
+
+**Resultado esperado**:
+- ✅ Tabela `secrets_provider_connection` NÃO EXISTE
+- ✅ Tabela `project_secrets_provider_access` EXISTE (sem FK)
+- ✅ Schema limpo para upgrade
+
+#### Passo 5: Documentar evidências
+
+```bash
+# Salvar timestamp da limpeza
+echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_cleanup.log
+
+# Registrar em DAILY_ACTIVITIES da sessão
+```
+
+### Validação pós-limpeza
+
+**Checklist**:
+- [ ] Conectado ao PostgreSQL como `n8n_admin`
+- [ ] Confirmado que `secrets_provider_connection` tem 0 registros
+- [ ] Confirmado que `project_secrets_provider_access` tem 0 registros
+- [ ] Executado `DROP TABLE IF EXISTS secrets_provider_connection CASCADE;`
+- [ ] Confirmado que tabela foi removida (SELECT retorna 0 linhas)
+- [ ] Confirmado que FK foi removida
+- [ ] Timestamp de limpeza documentado
+- [ ] Evidências salvas em sessão
+
+### Observações importantes
+
+1. **Por que CASCADE é seguro?**
+   - Ambas as tabelas estão completamente vazias
+   - Nenhum workflow ativo usa estas tabelas
+   - Nenhum dado será perdido
+
+2. **Por que a tabela existe em Produção e não no Lab?**
+   - Lab teve instalação/upgrade limpo
+   - Produção teve tentativa anterior de upgrade que falhou parcialmente
+   - Tabela ficou órfã no schema de Produção
+
+3. **Esta limpeza afeta workflows?**
+   - NÃO — nenhum workflow utiliza estas tabelas
+   - Validado via query: `SELECT * FROM workflow_entity WHERE nodes::text ILIKE '%secrets_provider%'`
+   - Resultado: 0 workflows encontrados
+
+4. **Preciso fazer backup antes?**
+   - Recomendado por segurança, mas tabelas estão vazias
+   - Backup mínimo: documentar estrutura da tabela (já feito no diagnóstico)
+
+### Referências
+
+- Diagnóstico completo: `.tmp/diagnostico_secrets_provider_20260504_102019.json`
+- Análise de falha: `docs/SESSIONS/2026-05-02/ANALISE_FALHA_HOP_2.6.4-2.7.0_2026-05-02.md`
+- Análise de sucesso do Lab: `docs/SESSIONS/2026-05-04/ANALISE_UPGRADE_LAB_SUCESSO.md`
+
+---
+
+##
 ## Procedimento por Checkpoint
 
 ### 1. Pre-check
