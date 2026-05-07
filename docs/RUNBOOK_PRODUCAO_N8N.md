@@ -8,9 +8,10 @@
 | 1.1 | 2026-04-29 | Sistema | Atualização trilha complementar 2.13.2 → 2.19.1 (Lab) |
 | 1.2 | 2026-05-02 | Sistema | Análise de falha HOP 1A em Produção - schema contaminado |
 | 1.3 | 2026-05-04 | Sistema | Procedimento de limpeza de schema PostgreSQL |
+| 1.4 | 2026-05-07 | Sistema | Correcoes C1-C5: trilha 14 hops, n8n_db, hosts separados, baseline credenciais, senha redatada |
 
-**Versão atual**: 1.3
-**Última atualização**: 2026-05-04
+**Versão atual**: 1.4
+**Última atualização**: 2026-05-07
 **Status**: Produção bloqueada em 2.6.4 | Lab em 2.19.1
 
 ---
@@ -27,14 +28,26 @@ Padronizar a aplicacao do processo de upgrade do n8n em producao com seguranca, 
 
 ## Acesso remoto padrao (obrigatorio)
 
-1. Usar exclusivamente o wrapper definido no JSON de segredos: `~/.local/bin/ssh-wfdb01`.
-2. Nao usar `ssh wfdb01` direto durante a operacao deste projeto.
-3. Host alvo operacional: `wfdb01`, usuario `archaris`, com `sudo` sem senha.
+> **ATENCAO — DOIS HOSTS distintos**: usar o wrapper correto para cada operacao.
 
-Exemplo de execucao padrao:
+| Host | Finalidade | Wrapper obrigatorio |
+|------|-----------|---------------------|
+| `wf001` | Containers Docker N8N Producao | `~/.local/bin/ssh-wf001` |
+| `wfdb01` | PostgreSQL — operacoes SQL diretas | `~/.local/bin/ssh-wfdb01` |
+
+- Nao usar SSH direto (`ssh wf001` ou `ssh wfdb01`) durante a operacao deste projeto.
+- Ambos os usuarios: `archaris`, com `sudo` sem senha.
+
+Exemplo — operacao em containers (wf001):
 
 ```bash
-~/.local/bin/ssh-wfdb01 'cd /opt/docker_user/n8n && docker compose images'
+~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && docker compose images'
+```
+
+Exemplo — operacao em banco de dados (wfdb01):
+
+```bash
+~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db'
 ```
 
 ## Pre-requisitos obrigatorios
@@ -45,6 +58,7 @@ Exemplo de execucao padrao:
 4. Aprovadores de gate definidos (tecnico e negocio).
 5. Plano de rollback testado (drill ou simulacao validada).
 6. **🔴 CRÍTICO**: Schema PostgreSQL limpo (sem tabelas órfãs) - ver seção "Limpeza de Schema".
+7. **🔴 CRÍTICO**: Credenciais integras — `SELECT COUNT(*) FROM credentials_entity;` deve retornar >= 61.
 
 ## Trilhas de Upgrade Disponíveis
 
@@ -52,12 +66,12 @@ Exemplo de execucao padrao:
 
 **Ambiente**: Produção (versão atual: 2.6.4)
 **Quando executar**: Após validação completa da trilha complementar no laboratório
-**Total de hops**: 13
-**Tempo estimado**: ~195 minutos (15 min/hop)
-**⚠️ CRÍTICO**: Deve percorrer TODAS as versões intermediárias, sem pular
+**Total de hops**: 14
+**Tempo estimado**: ~210 minutos (15 min/hop)
+**⚠️ CRÍTICO**: Deve percorrer TODAS as versoes intermediarias, sem pular. O HOP 2.6.4→2.7.0 e OBRIGATORIO — pular direto para 2.7.5 causa falha de migration (confirmado em 2026-03-24 e 2026-05-02).
 
-```
-2.6.4  → 2.7.5  → 2.8.4  → 2.9.4  → 2.10.4 → 2.11.4 → 2.12.3 →
+```text
+2.6.4  → 2.7.0  → 2.7.5  → 2.8.4  → 2.9.4  → 2.10.4 → 2.11.4 → 2.12.3 →
 2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1
 ```
 
@@ -177,15 +191,15 @@ CREATE TABLE secrets_provider_connection (
 ~/.local/bin/ssh-wfdb01
 
 # Conectar ao PostgreSQL como usuário administrativo
-psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db
+psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db
 ```
 
 **Credenciais** (de `.secrets/.env`):
 - Host: `82.197.64.145`
 - Port: `5432`
-- Database: `n8n_dev_db`
+- Database: `n8n_db`
 - User admin: `n8n_admin`
-- Password: `REDACTED_ADMIN_PASSWORD`
+- Password: consultar `.secrets/.env` (variavel `DB_POSTGRESDB_PASSWORD`) — nunca em texto claro
 
 #### Passo 2: Verificar existência da tabela
 
@@ -313,7 +327,7 @@ echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_
 
 1. Confirmar versao atual em runtime.
 2. Confirmar status dos containers (todos Up).
-3. Confirmar banco configurado (n8n_dev_db neste projeto).
+3. Confirmar banco configurado (`n8n_db` em Producao — via `~/.local/bin/ssh-wfdb01`).
 4. Coletar baseline de erros e metricas na janela de 15 minutos.
 
 ### 2. Backup

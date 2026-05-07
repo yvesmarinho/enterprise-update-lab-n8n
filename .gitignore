@@ -50,6 +50,10 @@ Thumbs.db
 *.tmp
 .idea/
 
+# Temporarios e diagnosticos (podem conter dados sensiveis)
+.tmp/
+tmp/
+
 # Logs
 *.log
 logs/

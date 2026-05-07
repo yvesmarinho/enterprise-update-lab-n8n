@@ -92,8 +92,9 @@ python3 .tmp/restore_credentials.py
 **Procedimento** (se absolutamente necessário):
 
 ```bash
-# 1. BACKUP DO BANCO (OBRIGATÓRIO!)
-~/.local/bin/ssh-wf001 "PGPASSWORD='REDACTED_DB_PASSWORD' pg_dump -h 82.197.64.145 -U n8n_user -d n8n_db > /tmp/n8n_db_backup_$(date +%Y%m%d_%H%M%S).sql"
+# 1. BACKUP DO BANCO (OBRIGATORIO!)
+# Senha: consultar .secrets/.env (variavel DB_POSTGRESDB_PASSWORD) — nunca em texto claro
+~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && source .env && PGPASSWORD="$DB_POSTGRESDB_PASSWORD" pg_dump -h 82.197.64.145 -U n8n_user -d n8n_db > /tmp/n8n_db_backup_$(date +%Y%m%d_%H%M%S).sql'
 
 # 2. PARAR N8N
 ~/.local/bin/ssh-wf001 "cd /opt/docker_user/n8n && docker compose down"
