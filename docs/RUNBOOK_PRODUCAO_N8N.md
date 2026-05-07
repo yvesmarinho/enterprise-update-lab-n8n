@@ -9,8 +9,9 @@
 | 1.2 | 2026-05-02 | Sistema | Análise de falha HOP 1A em Produção - schema contaminado |
 | 1.3 | 2026-05-04 | Sistema | Procedimento de limpeza de schema PostgreSQL |
 | 1.4 | 2026-05-07 | Sistema | Correcoes C1-C5: trilha 14 hops, n8n_db, hosts separados, baseline credenciais, senha redatada |
+| 1.5 | 2026-05-07 | Sistema | Revisao pre-upgrade 20h: limpeza SQL condicional, trilha complementar concluida, hosts wf001/wfdb01 corrigidos, checklist atualizado |
 
-**Versão atual**: 1.4
+**Versão atual**: 1.5
 **Última atualização**: 2026-05-07
 **Status**: Produção bloqueada em 2.6.4 | Lab em 2.19.1
 
@@ -86,31 +87,16 @@ Exemplo — operacao em banco de dados (wfdb01):
 ### 🔬 Trilha COMPLEMENTAR — Para Laboratório (2.13.2 → 2.19.1)
 
 **Ambiente**: Laboratório wfdb01 (versão atual: 2.13.2)
-**Quando executar**: AGORA (validação das versões mais recentes)
+**Quando executar**: ✅ CONCLUÍDA em 2026-04-29 (Lab já está em 2.19.1)
 **Total de hops**: 8
 **Tempo estimado**: ~120 minutos (15 min/hop)
-**Objetivo**: Validar versões 2.14-2.19 antes de aplicar trilha completa em produção
+**Objetivo**: Validar versões 2.14-2.19 antes de aplicar trilha completa em produção — **CONCLUÍDO**
 
 ```
 2.13.2 → 2.13.3 → 2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1
 ```
 
 ---
-
-### Trilha Histórica — Já Executada no Lab (2.6.4 → 2.13.2)
-
-**Período**: Março 2026
-**Status**: ✅ Completada até 2.13.2 (validado 2026-03-25)
-**Ambiente**: Laboratório wfdb01
-
-1. 2.6.4 -> 2.7.0
-2. 2.7.0 -> 2.7.5
-3. 2.7.5 -> 2.8.4
-4. 2.8.4 -> 2.9.4
-5. 2.9.4 -> 2.10.4 ⚠️ **BLOQUEADO** (pull não concluiu)
-6. 2.10.4 -> 2.11.4
-7. 2.11.4 -> 2.12.3
-8. 2.12.3 -> 2.13.2 ✅ **BASELINE ATUAL** (validado 2026-03-25)
 
 ### Trilha Histórica — Já Executada no Lab (2.6.4 → 2.13.2)
 
@@ -134,7 +120,8 @@ Exemplo — operacao em banco de dados (wfdb01):
 - Produção permanece em 2.6.4
 
 ---
-🔴 Limpeza de Schema PostgreSQL (OBRIGATÓRIO ANTES DO UPGRADE)
+
+## 🔴 Limpeza de Schema PostgreSQL (OBRIGATÓRIO ANTES DO UPGRADE)
 
 ### Contexto
 
@@ -220,7 +207,7 @@ SELECT COUNT(*) FROM project_secrets_provider_access;
 - `secrets_provider_connection`: 0 registros
 - `project_secrets_provider_access`: 0 registros
 
-#### Passo 3: Executar limpeza
+#### Passo 3: Executar limpeza condicional
 
 ```sql
 -- BACKUP: Documentar estado antes da limpeza
@@ -231,11 +218,27 @@ SELECT
 FROM information_schema.table_constraints tc
 WHERE tc.table_name IN ('secrets_provider_connection', 'project_secrets_provider_access');
 
--- EXECUTAR LIMPEZA
-DROP TABLE IF EXISTS secrets_provider_connection CASCADE;
-
--- COMMIT (se estiver em transação)
-COMMIT;
+-- LIMPEZA CONDICIONAL: so executa DROP se a tabela existir E estiver vazia
+DO $$
+DECLARE
+    v_count INTEGER := 0;
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM pg_tables
+        WHERE tablename = 'secrets_provider_connection'
+          AND schemaname = 'public'
+    ) THEN
+        SELECT COUNT(*) INTO v_count FROM secrets_provider_connection;
+        IF v_count = 0 THEN
+            DROP TABLE secrets_provider_connection CASCADE;
+            RAISE NOTICE 'OK: secrets_provider_connection removida (estava vazia).';
+        ELSE
+            RAISE EXCEPTION 'ABORTADO: tabela contem % registro(s) — revisao manual obrigatoria.', v_count;
+        END IF;
+    ELSE
+        RAISE NOTICE 'OK: secrets_provider_connection nao existe — schema ja esta limpo.';
+    END IF;
+END $$;
 ```
 
 **Efeito do CASCADE**:
@@ -285,7 +288,7 @@ echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_
 - [ ] Conectado ao PostgreSQL como `n8n_admin`
 - [ ] Confirmado que `secrets_provider_connection` tem 0 registros
 - [ ] Confirmado que `project_secrets_provider_access` tem 0 registros
-- [ ] Executado `DROP TABLE IF EXISTS secrets_provider_connection CASCADE;`
+- [ ] Executado bloco condicional `DO $$ ... END $$;` — limpeza automatica se vazia, aborta se houver dados
 - [ ] Confirmado que tabela foi removida (SELECT retorna 0 linhas)
 - [ ] Confirmado que FK foi removida
 - [ ] Timestamp de limpeza documentado
@@ -320,15 +323,15 @@ echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_
 
 ---
 
-##
 ## Procedimento por Checkpoint
 
 ### 1. Pre-check
 
-1. Confirmar versao atual em runtime.
-2. Confirmar status dos containers (todos Up).
-3. Confirmar banco configurado (`n8n_db` em Producao — via `~/.local/bin/ssh-wfdb01`).
-4. Coletar baseline de erros e metricas na janela de 15 minutos.
+1. Confirmar versao atual em runtime: `~/.local/bin/ssh-wf001 'docker inspect n8n_editor --format "{{.Config.Image}}"'`
+2. Confirmar status dos containers (todos Up): `~/.local/bin/ssh-wf001 'docker ps --filter "name=n8n" --format "table {{.Names}}\t{{.Status}}"'`
+3. Verificar schema limpo em `n8n_db` — executar limpeza condicional (ver secao **🔴 Limpeza de Schema**) via `~/.local/bin/ssh-wfdb01`.
+4. Verificar credenciais integras: `~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db -c "SELECT COUNT(*) FROM credentials_entity;"'` — deve retornar >= 61.
+5. Coletar baseline de erros e metricas na janela de 15 minutos.
 
 ### 2. Backup
 
@@ -339,7 +342,8 @@ echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_
 Exemplo minimo (quando sem permissao de escrita no diretorio do stack):
 
 ```bash
-~/.local/bin/ssh-wfdb01 'cd /opt/docker_user/n8n && ts=$(date -u +%Y%m%dT%H%M%SZ) && sudo cp docker-compose.yaml /tmp/docker-compose.yaml.$ts'
+# Backup em wf001 (host dos containers Docker de Producao)
+~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && ts=$(date -u +%Y%m%dT%H%M%SZ) && sudo cp docker-compose.yaml /tmp/docker-compose.yaml.$ts && sudo cp .env /tmp/.env.$ts && echo "Backup: $ts"'
 ```
 
 ### 3. Aplicacao do hop
@@ -380,7 +384,11 @@ Exemplo minimo (quando sem permissao de escrita no diretorio do stack):
 Exemplo de rollback de imagem (com sudo no compose):
 
 ```bash
-~/.local/bin/ssh-wfdb01 'cd /opt/docker_user/n8n && sudo sed -i "s/n8nio\/n8n:2.7.5/n8nio\/n8n:2.6.4/g" docker-compose.yaml && docker compose up -d'
+# Rollback em wf001 (host dos containers Docker de Producao)
+~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && sudo sed -i "s/n8nio\/n8n:VERSAO_NOVA/n8nio\/n8n:VERSAO_ANTERIOR/g" docker-compose.yaml && docker compose up -d'
+
+# Confirmar versao restaurada
+~/.local/bin/ssh-wf001 'docker inspect n8n_editor --format "{{.Config.Image}}"'
 ```
 
 ## Evidencias obrigatorias por hop
@@ -394,11 +402,14 @@ Exemplo de rollback de imagem (com sudo no compose):
 
 ## Checklist rapido de producao
 
-1. Janela e comunicacao aprovadas.
-2. Backups concluidos e verificaveis.
-3. Hop executado e versao confirmada.
-4. Gate validado em 15 minutos.
-5. Evidencias anexadas no changelog da rodada.
+1. Janela de manutencao e comunicacao aprovadas.
+2. Schema PostgreSQL limpo — bloco `DO $$ ... END $$;` executado em `n8n_db` (via `ssh-wfdb01`) sem EXCEPTION.
+3. Credenciais integras — `SELECT COUNT(*) FROM credentials_entity;` retornou >= 61.
+4. Backups concluidos — compose + `.env` copiados em `/tmp/` no `wf001` (via `ssh-wf001`).
+5. Variaveis de ambiente verificadas no `.env` remoto: `DB_POSTGRESDB_STATEMENT_TIMEOUT=0`, `N8N_PROXY_HOPS=1`, `NODE_OPTIONS=--no-deprecation`.
+6. Hop executado e versao confirmada em runtime (`docker inspect n8n_editor`).
+7. Gate validado em 15 minutos.
+8. Evidencias anexadas no changelog da rodada.
 
 ## Observacoes desta sessao (2026-03-24)
 

@@ -185,11 +185,30 @@ SELECT COUNT(*) FROM secrets_provider_connection;
 SELECT COUNT(*) FROM project_secrets_provider_access;
 ```
 
-### Limpeza (somente se tabelas estiverem vazias)
+### Limpeza condicional (executa DROP somente se a tabela estiver vazia)
 
 ```sql
--- Remover tabela orfa e FK dependente
-DROP TABLE IF EXISTS secrets_provider_connection CASCADE;
+-- Remocao condicional: so executa se a tabela existir E estiver vazia
+DO $$
+DECLARE
+    v_count INTEGER := 0;
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM pg_tables
+        WHERE tablename = 'secrets_provider_connection'
+          AND schemaname = 'public'
+    ) THEN
+        SELECT COUNT(*) INTO v_count FROM secrets_provider_connection;
+        IF v_count = 0 THEN
+            DROP TABLE secrets_provider_connection CASCADE;
+            RAISE NOTICE 'OK: secrets_provider_connection removida (estava vazia).';
+        ELSE
+            RAISE EXCEPTION 'ABORTADO: tabela contem % registro(s) — revisao manual obrigatoria.', v_count;
+        END IF;
+    ELSE
+        RAISE NOTICE 'OK: secrets_provider_connection nao existe — schema ja esta limpo.';
+    END IF;
+END $$;
 
 -- Validar remocao
 SELECT tablename FROM pg_tables WHERE tablename = 'secrets_provider_connection';
@@ -267,8 +286,8 @@ SELECT tablename FROM pg_tables WHERE tablename = 'secrets_provider_connection';
 ### 6. Rollback (se NO-GO)
 
 ```bash
-# Restaurar compose do backup (substituir TIMESTAMP)
-~/.local/bin/ssh-wfdb01 'cp /tmp/docker-compose.yaml.TIMESTAMP /opt/docker_user/n8n/docker-compose.yaml'
+# Restaurar compose do backup (substituir TIMESTAMP pelo valor real)
+~/.local/bin/ssh-wfdb01 'sudo cp /tmp/docker-compose.yaml.TIMESTAMP /opt/docker_user/n8n/docker-compose.yaml'
 ~/.local/bin/ssh-wfdb01 'cd /opt/docker_user/n8n && docker compose up -d'
 
 # Verificar versao restaurada
