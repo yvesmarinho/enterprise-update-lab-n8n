@@ -9,9 +9,10 @@
 | 1.2 | 2026-05-02 | Sistema | Análise de falha HOP 1A em Produção - schema contaminado |
 | 1.3 | 2026-05-04 | Sistema | Procedimento de limpeza de schema PostgreSQL |
 | 1.4 | 2026-05-07 | Sistema | Correcoes C1-C5: trilha 14 hops, n8n_db, hosts separados, baseline credenciais, senha redatada |
-| 1.5 | 2026-05-07 | Sistema | Revisao pre-upgrade 20h: limpeza SQL condicional, trilha complementar concluida, hosts wf001/wfdb01 corrigidos, checklist atualizado |
+| 1.5 | 2026-05-07 | Sistema | Revisao pre-upgrade 20h: limpeza SQL condicional, trilha complementar concluida, hosts wf001/wfdb02 corrigidos, checklist atualizado |
+| 1.6 | 2026-05-07 | Sistema | Correcao host DB: wfdb01 → wfdb02 (82.197.64.145) em todo o documento |
 
-**Versão atual**: 1.5
+**Versão atual**: 1.6
 **Última atualização**: 2026-05-07
 **Status**: Produção bloqueada em 2.6.4 | Lab em 2.19.1
 
@@ -31,11 +32,11 @@ Padronizar a aplicacao do processo de upgrade do n8n em producao com seguranca, 
 
 > **ATENCAO — DOIS HOSTS + SQL LOCAL**: usar o metodo correto para cada operacao.
 
-| Operacao | Host | Metodo obrigatorio |
-|----------|------|--------------------|
-| Containers Docker N8N Producao | `wf001` (31.220.103.208) | `~/.local/bin/ssh-wf001` |
-| Containers Docker N8N Lab | `wfdb01` (82.197.64.145) | `~/.local/bin/ssh-wfdb01` |
-| SQL / PostgreSQL | `wfdb01` (82.197.64.145:5432) | `psql` **neste computador** (sem SSH) |
+| Operacao | Host | Metodo obrigatorio | base de dados |
+|----------|------|--------------------|---------------|
+| Containers Docker N8N Producao | `wf001` (31.220.103.208) | `~/.local/bin/ssh-wf001` | n8n_db |
+| Containers Docker N8N Lab | `wfdb01` (86.48.31.149) | `~/.local/bin/ssh-wfdb01` | n8n_dev_db |
+| SQL / PostgreSQL | `wfdb02` (82.197.64.145:5432) | `psql` **neste computador** (sem SSH) | null |
 
 - Nao usar SSH direto (`ssh wf001` ou `ssh wfdb01`) durante a operacao deste projeto.
 - **wf001 e wfdb01 NAO tem psql instalado** — todo comando SQL roda neste computador.
@@ -47,7 +48,7 @@ Exemplo — operacao em containers (wf001):
 ~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && docker compose images'
 ```
 
-Exemplo — operacao em banco de dados (PostgreSQL em wfdb01, executar NESTE COMPUTADOR):
+Exemplo — operacao em banco de dados (PostgreSQL em wfdb02, executar NESTE COMPUTADOR):
 
 ```bash
 # psql roda localmente — nenhum dos hosts tem psql instalado

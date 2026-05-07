@@ -35,7 +35,7 @@ Documentar procedimentos de upgrade do N8N no ambiente de laboratório (wfdb01) 
 
 | Aspecto | Lab (este documento) | Producao |
 |---------|---------------------|----------|
-| Servidor Docker | `wfdb01` (82.197.64.145) | `wf001` (31.220.103.208) |
+| Servidor Docker | `wfdb01` (86.48.31.149) | `wf001` (31.220.103.208) |
 | Acesso SSH | `~/.local/bin/ssh-wfdb01` | `~/.local/bin/ssh-wf001` |
 | Database PostgreSQL | `n8n_dev_db` | `n8n_db` |
 | Gate de validacao | 5-10 min/hop | 15 min/hop |
