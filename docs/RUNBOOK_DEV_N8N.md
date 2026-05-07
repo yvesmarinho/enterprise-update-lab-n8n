@@ -57,10 +57,11 @@ Documentar procedimentos de upgrade do N8N no ambiente de laboratório (wfdb01) 
 ~/.local/bin/ssh-wfdb01 'cd /opt/docker_user/n8n && docker compose ps'
 ```
 
-### Operacoes em banco de dados (PostgreSQL — Lab)
+### Operacoes em banco de dados (PostgreSQL — executar NESTE COMPUTADOR)
 
 ```bash
-~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db'
+# psql roda localmente — wfdb01 nao tem psql instalado
+psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db
 ```
 
 **Credenciais**: consultar `.secrets/.env` — nunca em texto claro ou arquivos versionados.
@@ -230,9 +231,9 @@ SELECT tablename FROM pg_tables WHERE tablename = 'secrets_provider_connection';
 # Status dos containers
 ~/.local/bin/ssh-wfdb01 'docker ps --filter "name=n8n" --format "table {{.Names}}\t{{.Status}}"'
 
-# Schema limpo
-~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db \
-  -c "SELECT tablename FROM pg_tables WHERE tablename = '"'"'secrets_provider_connection'"'"';"'
+# Schema limpo (executar neste computador — wfdb01 nao tem psql)
+psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_dev_db \
+  -c "SELECT tablename FROM pg_tables WHERE tablename = 'secrets_provider_connection';"
 ```
 
 ### 2. Backup

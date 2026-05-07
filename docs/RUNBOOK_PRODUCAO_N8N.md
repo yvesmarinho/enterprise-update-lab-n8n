@@ -29,14 +29,16 @@ Padronizar a aplicacao do processo de upgrade do n8n em producao com seguranca, 
 
 ## Acesso remoto padrao (obrigatorio)
 
-> **ATENCAO — DOIS HOSTS distintos**: usar o wrapper correto para cada operacao.
+> **ATENCAO — DOIS HOSTS + SQL LOCAL**: usar o metodo correto para cada operacao.
 
-| Host | Finalidade | Wrapper obrigatorio |
-|------|-----------|---------------------|
-| `wf001` | Containers Docker N8N Producao | `~/.local/bin/ssh-wf001` |
-| `wfdb01` | PostgreSQL — operacoes SQL diretas | `~/.local/bin/ssh-wfdb01` |
+| Operacao | Host | Metodo obrigatorio |
+|----------|------|--------------------|
+| Containers Docker N8N Producao | `wf001` (31.220.103.208) | `~/.local/bin/ssh-wf001` |
+| Containers Docker N8N Lab | `wfdb01` (82.197.64.145) | `~/.local/bin/ssh-wfdb01` |
+| SQL / PostgreSQL | `wfdb01` (82.197.64.145:5432) | `psql` **neste computador** (sem SSH) |
 
 - Nao usar SSH direto (`ssh wf001` ou `ssh wfdb01`) durante a operacao deste projeto.
+- **wf001 e wfdb01 NAO tem psql instalado** — todo comando SQL roda neste computador.
 - Ambos os usuarios: `archaris`, com `sudo` sem senha.
 
 Exemplo — operacao em containers (wf001):
@@ -45,10 +47,11 @@ Exemplo — operacao em containers (wf001):
 ~/.local/bin/ssh-wf001 'cd /opt/docker_user/n8n && docker compose images'
 ```
 
-Exemplo — operacao em banco de dados (wfdb01):
+Exemplo — operacao em banco de dados (PostgreSQL em wfdb01, executar NESTE COMPUTADOR):
 
 ```bash
-~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db'
+# psql roda localmente — nenhum dos hosts tem psql instalado
+psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db
 ```
 
 ## Pre-requisitos obrigatorios
@@ -174,10 +177,7 @@ CREATE TABLE secrets_provider_connection (
 #### Passo 1: Conectar ao PostgreSQL
 
 ```bash
-# Via SSH no host wfdb01
-~/.local/bin/ssh-wfdb01
-
-# Conectar ao PostgreSQL como usuário administrativo
+# Executar NESTE COMPUTADOR (wf001 e wfdb01 nao tem psql instalado)
 psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db
 ```
 
@@ -329,8 +329,14 @@ echo "Schema cleanup executed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/schema_
 
 1. Confirmar versao atual em runtime: `~/.local/bin/ssh-wf001 'docker inspect n8n_editor --format "{{.Config.Image}}"'`
 2. Confirmar status dos containers (todos Up): `~/.local/bin/ssh-wf001 'docker ps --filter "name=n8n" --format "table {{.Names}}\t{{.Status}}"'`
-3. Verificar schema limpo em `n8n_db` — executar limpeza condicional (ver secao **🔴 Limpeza de Schema**) via `~/.local/bin/ssh-wfdb01`.
-4. Verificar credenciais integras: `~/.local/bin/ssh-wfdb01 'psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db -c "SELECT COUNT(*) FROM credentials_entity;"'` — deve retornar >= 61.
+3. Verificar schema limpo em `n8n_db` — executar limpeza condicional (ver secao **🔴 Limpeza de Schema**) via `psql` neste computador.
+4. Verificar credenciais integras — executar neste computador:
+
+   ```bash
+   psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db -c "SELECT COUNT(*) FROM credentials_entity;"
+   ```
+
+   Deve retornar >= 61.
 5. Coletar baseline de erros e metricas na janela de 15 minutos.
 
 ### 2. Backup
@@ -403,7 +409,7 @@ Exemplo de rollback de imagem (com sudo no compose):
 ## Checklist rapido de producao
 
 1. Janela de manutencao e comunicacao aprovadas.
-2. Schema PostgreSQL limpo — bloco `DO $$ ... END $$;` executado em `n8n_db` (via `ssh-wfdb01`) sem EXCEPTION.
+2. Schema PostgreSQL limpo — bloco `DO $$ ... END $$;` executado neste computador em `n8n_db` sem EXCEPTION.
 3. Credenciais integras — `SELECT COUNT(*) FROM credentials_entity;` retornou >= 61.
 4. Backups concluidos — compose + `.env` copiados em `/tmp/` no `wf001` (via `ssh-wf001`).
 5. Variaveis de ambiente verificadas no `.env` remoto: `DB_POSTGRESDB_STATEMENT_TIMEOUT=0`, `N8N_PROXY_HOPS=1`, `NODE_OPTIONS=--no-deprecation`.
