@@ -11,12 +11,18 @@
 | 1.4 | 2026-05-07 | Sistema | Correcoes C1-C5: trilha 14 hops, n8n_db, hosts separados, baseline credenciais, senha redatada |
 | 1.5 | 2026-05-07 | Sistema | Revisao pre-upgrade 20h: limpeza SQL condicional, trilha complementar concluida, hosts wf001/wfdb02 corrigidos, checklist atualizado |
 | 1.6 | 2026-05-07 | Sistema | Correcao host DB: wfdb01 → wfdb02 (82.197.64.145) em todo o documento |
+| 1.7 | 2026-05-07 | Sistema | Upgrade de produção concluído: 2.6.4 → 2.19.5 (15 hops, sem regressões) |
 
-**Versão atual**: 1.6
+**Versão atual**: 1.7
 **Última atualização**: 2026-05-07
-**Status**: Produção bloqueada em 2.6.4 | Lab em 2.19.1
+**Status**: ✅ Produção em 2.19.5 | Lab em 2.19.1
 
 ---
+
+## ATENÇÃO
+
+EXPRESSAMENTE PROIÍBIDO UTILIZAR DADOS SENSÍVEIS EM MODO TEXTO!!
+ACESSO AO BANCO DE DADOS DEVEM SER FEITOS POR CÓDIGOS PYTHON!!
 
 ## Objetivo
 
@@ -41,6 +47,8 @@ Padronizar a aplicacao do processo de upgrade do n8n em producao com seguranca, 
 - Nao usar SSH direto (`ssh wf001` ou `ssh wfdb01`) durante a operacao deste projeto.
 - **wf001 e wfdb01 NAO tem psql instalado** — todo comando SQL roda neste computador.
 - Ambos os usuarios: `archaris`, com `sudo` sem senha.
+
+**arquivo com as credenciais de banco de dados em .secrets/.env**
 
 Exemplo — operacao em containers (wf001):
 
@@ -67,17 +75,17 @@ psql -h 82.197.64.145 -p 5432 -U n8n_admin -d n8n_db
 
 ## Trilhas de Upgrade Disponíveis
 
-### 🏭 Trilha COMPLETA — Para Produção (2.6.4 → 2.19.1)
+### 🏭 Trilha COMPLETA — Para Produção (2.6.4 → 2.19.5) ✅ CONCLUÍDA
 
-**Ambiente**: Produção (versão atual: 2.6.4)
-**Quando executar**: Após validação completa da trilha complementar no laboratório
-**Total de hops**: 14
-**Tempo estimado**: ~210 minutos (15 min/hop)
+**Ambiente**: Produção
+**Quando executar**: ✅ CONCLUÍDA em 2026-05-07 (Produção está em 2.19.5)
+**Total de hops**: 15
+**Tempo total**: ~6h (sessão noturna 2026-05-07/08)
 **⚠️ CRÍTICO**: Deve percorrer TODAS as versoes intermediarias, sem pular. O HOP 2.6.4→2.7.0 e OBRIGATORIO — pular direto para 2.7.5 causa falha de migration (confirmado em 2026-03-24 e 2026-05-02).
 
 ```text
 2.6.4  → 2.7.0  → 2.7.5  → 2.8.4  → 2.9.4  → 2.10.4 → 2.11.4 → 2.12.3 →
-2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1
+2.13.4 → 2.14.2 → 2.15.1 → 2.16.2 → 2.17.8 → 2.18.5 → 2.19.1 → 2.19.5
 ```
 
 **Séries cobertas**:
